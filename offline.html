@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANON·BOARDS — Offline</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #ffffff;
+    color: #212529;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+  }
+  .container { max-width: 420px; }
+  .logo { font-weight: 700; font-size: 1.4rem; letter-spacing: 0.08em; margin-bottom: 2rem; }
+  .logo span { color: #6c757d; }
+  h1 { font-size: 1.2rem; margin-bottom: 0.75rem; }
+  p { font-size: 0.85rem; color: #6c757d; line-height: 1.7; margin-bottom: 1.5rem; }
+  .btn {
+    display: inline-block;
+    padding: 0.65rem 1.5rem;
+    background: #6c757d;
+    color: #fff;
+    border: none;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: #5a6268; }
+  .icon { font-size: 3rem; margin-bottom: 1.5rem; display: block; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="logo">ANON<span>·</span>BOARDS</div>
+  <span class="icon">📡</span>
+  <h1>You're offline</h1>
+  <p>Looks like you've lost your internet connection. ANON·BOARDS needs a connection to load new posts and sync data. Your locally stored data is safe.</p>
+  <button class="btn" onclick="location.reload()">Try again →</button>
+</div>
+</body>
+</html>

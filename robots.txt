@@ -1,0 +1,10 @@
+# ANON·BOARDS — robots.txt
+User-agent: *
+Allow: /
+
+# Disallow admin/moderation pages
+Disallow: /admin/
+Disallow: /mod/
+
+# Sitemap (update URL to your actual domain)
+Sitemap: https://anon-boards.netlify.app/sitemap.xml
