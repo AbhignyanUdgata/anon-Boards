@@ -66,7 +66,7 @@
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
 <!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
 
 <!-- sql.js (SQLite in WebAssembly) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -83,6 +83,8 @@
     --surface2: #e9ecef;
     --border: #dee2e6;
     --accent: #6c757d;
+    --accent2: #e91e8c;
+    --accent3: #4da6ff;
     --text: #212529;
     --muted: #6c757d;
     --danger: #dc3545;
@@ -131,6 +133,19 @@
     border: 1px solid var(--border);
     padding: 0.3rem 0.7rem;
     border-radius: 4px;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #28a745;
+    flex-shrink: 0;
+    animation: dotPulse 2s ease-in-out infinite;
+  }
+  @keyframes dotPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
   }
 
   /* LAYOUT */
@@ -1652,6 +1667,268 @@
   }
   .skip-link:focus { top: 0; }
 </style>
+
+<style>
+/* ── AUTH MODAL REDESIGN ─────────────────────────────────────────────── */
+.auth-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,15,0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.auth-overlay.open { display: flex; animation: authFadeIn 0.22s ease; }
+@keyframes authFadeIn { from { opacity:0; } to { opacity:1; } }
+
+.auth-card {
+  background: #0f1117;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06);
+  animation: authSlideUp 0.28s cubic-bezier(0.34,1.56,0.64,1);
+  overflow: hidden;
+  position: relative;
+}
+@keyframes authSlideUp {
+  from { transform: translateY(40px) scale(0.97); opacity:0; }
+  to   { transform: translateY(0) scale(1); opacity:1; }
+}
+
+/* decorative gradient top border */
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #6c757d 0%, #adb5bd 40%, #6c757d 100%);
+}
+
+.auth-card-header {
+  padding: 2.2rem 2.2rem 1.4rem;
+  text-align: center;
+}
+.auth-logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, #343a40 0%, #212529 100%);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 1.1rem;
+  font-size: 1.6rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.auth-card-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.45rem;
+  color: #f8f9fa;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.3rem;
+}
+.auth-card-sub {
+  font-size: 0.78rem;
+  color: #6c757d;
+  line-height: 1.5;
+}
+
+.auth-card-body { padding: 0 2.2rem 2.2rem; }
+
+.auth-field { margin-bottom: 1.1rem; }
+.auth-field label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6c757d;
+  margin-bottom: 0.45rem;
+}
+.auth-input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #f8f9fa;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.92rem;
+  padding: 0.75rem 1rem;
+  outline: none;
+  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+}
+.auth-input::placeholder { color: #495057; }
+.auth-input:focus {
+  border-color: rgba(173,181,189,0.5);
+  background: rgba(255,255,255,0.07);
+  box-shadow: 0 0 0 3px rgba(108,117,125,0.15);
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 0.82rem;
+  background: #f8f9fa;
+  color: #212529;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.18s;
+  margin-top: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.auth-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+.auth-btn:hover {
+  background: #e9ecef;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(248,249,250,0.2);
+}
+.auth-btn:active { transform: translateY(0); }
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.2rem 0;
+  color: #495057;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.07);
+}
+
+.auth-notice {
+  background: rgba(108,117,125,0.08);
+  border: 1px solid rgba(108,117,125,0.15);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  color: #6c757d;
+  line-height: 1.55;
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  margin-bottom: 1.1rem;
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 1.3rem;
+  font-size: 0.78rem;
+  color: #6c757d;
+}
+.auth-switch a {
+  color: #adb5bd;
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(173,181,189,0.3);
+  transition: color 0.15s, border-color 0.15s;
+}
+.auth-switch a:hover { color: #f8f9fa; border-color: rgba(248,249,250,0.4); }
+
+.auth-close {
+  position: absolute;
+  top: 1.1rem; right: 1.1rem;
+  width: 30px; height: 30px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  color: #6c757d;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.auth-close:hover { background: rgba(220,53,69,0.15); border-color: rgba(220,53,69,0.3); color: #dc3545; }
+
+/* ── BOARD TABS ─────────────────────────────────────────────────────── */
+.board-tabs-wrap {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: relative;
+}
+.board-tabs-wrap::-webkit-scrollbar { display: none; }
+
+.board-tab {
+  flex-shrink: 0;
+  padding: 0.65rem 1.1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+.board-tab:hover { color: var(--text); }
+.board-tab.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+/* pagination */
+.posts-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.page-btn {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.75rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-radius: 2px;
+}
+.page-btn:hover, .page-btn.active {
+  border-color: var(--accent);
+  color: var(--text);
+  background: var(--surface2);
+}
+.page-btn:disabled { opacity: 0.3; cursor: default; }
+.page-info { font-size: 0.72rem; color: var(--muted); padding: 0 0.5rem; }
+</style>
 </head>
 <body>
 
@@ -1766,7 +2043,11 @@
       <div class="stat-item"><strong>∞</strong>&nbsp;no accounts</div>
     </div>
 
-    <div class="posts-list" id="posts-list"></div>
+    <!-- BOARD TABS -->
+    <div class="board-tabs-wrap" id="board-tabs" role="tablist" aria-label="Board filter tabs"></div>
+
+    <div class="posts-list" id="posts-list" role="tabpanel"></div>
+    <div class="posts-pagination" id="posts-pagination" style="display:none;"></div>
   </main>
 
   <!-- PROFILE & ADMIN PANEL -->
@@ -2148,60 +2429,63 @@
   </div>
 </div>
 
-<!-- LOGIN MODAL -->
-<div class="overlay" id="login-modal" onclick="closeOnOverlay(event, 'login-modal')">
-  <div class="modal" style="max-width:400px;">
-    <div class="modal-header">
-      <div class="modal-title">🔑 Login to Account</div>
-      <button class="close-btn" onclick="closeModal('login-modal')">✕</button>
+<!-- LOGIN MODAL (redesigned) -->
+<div class="auth-overlay" id="login-modal" onclick="if(event.target===this)closeModal('login-modal')">
+  <div class="auth-card">
+    <button class="auth-close" onclick="closeModal('login-modal')" aria-label="Close">✕</button>
+    <div class="auth-card-header">
+      <div class="auth-logo-mark">🔒</div>
+      <div class="auth-card-title">Welcome back</div>
+      <div class="auth-card-sub">Sign in to your ANON·BOARDS account</div>
     </div>
-    <div class="new-post-form">
-      <div class="anon-notice" style="background:rgba(107,184,255,0.05);border-color:rgba(107,184,255,0.2);">
-        Log in to save posts, manage favorites, and keep your account.
+    <div class="auth-card-body">
+      <div class="auth-notice">
+        🛡️ Your real identity stays hidden. We only store your username and hashed password — no email, no IP, nothing else.
       </div>
-      <div class="form-group">
-        <label class="form-label">Username</label>
-        <input class="form-input" id="login-username" placeholder="Your username" type="text">
+      <div class="auth-field">
+        <label for="login-username">Username</label>
+        <input class="auth-input" id="login-username" placeholder="Enter your username" type="text" autocomplete="username">
       </div>
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input class="form-input" id="login-password" placeholder="Your password" type="password">
+      <div class="auth-field">
+        <label for="login-password">Password</label>
+        <input class="auth-input" id="login-password" placeholder="Enter your password" type="password" autocomplete="current-password">
       </div>
-      <button class="submit-btn" onclick="submitLogin()" style="width:100%;">Login →</button>
-      <div style="text-align:center;margin-top:1rem;font-size:0.75rem;">
-        Don't have an account? <a href="#" onclick="closeModal('login-modal');openModal('register-modal');return false;" style="color:var(--accent3);text-decoration:underline;">Create one</a>
+      <button class="auth-btn" onclick="submitLogin()">Sign in →</button>
+      <div class="auth-switch">
+        No account? <a href="#" onclick="closeModal('login-modal');openModal('register-modal');return false;">Create one free</a>
       </div>
     </div>
   </div>
 </div>
 
-<!-- REGISTER MODAL -->
-<div class="overlay" id="register-modal" onclick="closeOnOverlay(event, 'register-modal')">
-  <div class="modal" style="max-width:400px;">
-    <div class="modal-header">
-      <div class="modal-title">✍️ Create Account</div>
-      <button class="close-btn" onclick="closeModal('register-modal')">✕</button>
+<!-- REGISTER MODAL (redesigned) -->
+<div class="auth-overlay" id="register-modal" onclick="if(event.target===this)closeModal('register-modal')">
+  <div class="auth-card">
+    <button class="auth-close" onclick="closeModal('register-modal')" aria-label="Close">✕</button>
+    <div class="auth-card-header">
+      <div class="auth-logo-mark">✍️</div>
+      <div class="auth-card-title">Create account</div>
+      <div class="auth-card-sub">Join ANON·BOARDS — no email required</div>
     </div>
-    <div class="new-post-form">
-      <div class="anon-notice" style="background:rgba(127,255,110,0.05);border-color:rgba(127,255,110,0.2);">
-        Create an account to save posts and manage your profile.
-        Your user ID remains anonymous on the forum.
+    <div class="auth-card-body">
+      <div class="auth-notice">
+        🔐 Only a username and password needed. Your anonymous identity (e.g. ANON_IronWolf_6754) is auto-generated and fixed to your account.
       </div>
-      <div class="form-group">
-        <label class="form-label">Username</label>
-        <input class="form-input" id="register-username" placeholder="Choose a username (3+ chars)" type="text">
+      <div class="auth-field">
+        <label for="register-username">Username</label>
+        <input class="auth-input" id="register-username" placeholder="Choose a username (3+ chars)" type="text" autocomplete="username">
       </div>
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input class="form-input" id="register-password" placeholder="Enter password (6+ chars)" type="password">
+      <div class="auth-field">
+        <label for="register-password">Password</label>
+        <input class="auth-input" id="register-password" placeholder="Choose a password (6+ chars)" type="password" autocomplete="new-password">
       </div>
-      <div class="form-group">
-        <label class="form-label">Confirm Password</label>
-        <input class="form-input" id="register-confirm" placeholder="Confirm your password" type="password">
+      <div class="auth-field">
+        <label for="register-confirm">Confirm password</label>
+        <input class="auth-input" id="register-confirm" placeholder="Repeat your password" type="password" autocomplete="new-password">
       </div>
-      <button class="submit-btn" onclick="registerNewAccount()" style="width:100%;">Create Account →</button>
-      <div style="text-align:center;margin-top:1rem;font-size:0.75rem;">
-        Already have an account? <a href="#" onclick="closeModal('register-modal');openModal('login-modal');return false;" style="color:var(--accent3);text-decoration:underline;">Login</a>
+      <button class="auth-btn" onclick="registerNewAccount()">Create account →</button>
+      <div class="auth-switch">
+        Already have an account? <a href="#" onclick="closeModal('register-modal');openModal('login-modal');return false;">Sign in</a>
       </div>
     </div>
   </div>
@@ -2650,23 +2934,21 @@ function exportSettings() {
 
 // Reset settings to defaults
 function resetSettings() {
-  if (confirm('Reset all settings to default? This cannot be undone.')) {
-    userSettings = {
-      compact: false,
-      thumbnails: true,
-      fontSize: 'medium',
-      anonymous: true,
-      onlineStatus: true,
-      notifications: true,
-      postAlerts: false,
-      showNSFW: false,
-      showSpoilers: false,
-      postsPerPage: 20
-    };
-    saveUserSettings();
-    applySettings();
-    alert('✓ Settings reset to defaults');
-  }
+  userSettings = {
+    compact: false,
+    thumbnails: true,
+    fontSize: 'medium',
+    anonymous: true,
+    onlineStatus: true,
+    notifications: true,
+    postAlerts: false,
+    showNSFW: false,
+    showSpoilers: false,
+    postsPerPage: 20
+  };
+  saveUserSettings();
+  applySettings();
+  showToast('✓ Settings reset to defaults');
 }
 
 // User menu
@@ -2700,14 +2982,11 @@ async function registerNewAccount() {
   const confirm = document.getElementById('register-confirm').value;
   
   if (password !== confirm) {
-    alert('❌ Passwords do not match');
+    showToast('❌ Passwords do not match');
     return;
   }
   
   if (await createUserAccount(username, password)) {
-    // Success message for account creation
-    alert(`✓ Account created successfully!\nUsername: ${username}\n\nLogging in...`);
-    
     document.getElementById('register-username').value = '';
     document.getElementById('register-password').value = '';
     document.getElementById('register-confirm').value = '';
@@ -2723,11 +3002,13 @@ function openChangePassword() {
   closeModal('settings-dropdown');
   openModal('change-password-modal');
 }
+// Alias used in dropdown
+function openChangePasswordModal() { openChangePassword(); }
 
 // Open user profile view
 function openUserProfile() {
   if (!authenticatedUser) {
-    alert('❌ Not logged in');
+    showToast('❌ Not logged in');
     return;
   }
   
@@ -2765,16 +3046,16 @@ function closeProfilePanel() {
 // View saved posts
 function openFavoritesView() {
   if (!authenticatedUser) {
-    alert('❌ Not logged in');
+    showToast('❌ Not logged in');
     return;
   }
   const favorites = getUserFavorites();
   if (favorites.length === 0) {
-    alert('❌ No saved posts yet');
+    showToast('❌ No saved posts yet');
     return;
   }
   console.log(`♥️ Your ${favorites.length} saved posts:`, favorites);
-  alert(`♥️ You have ${favorites.length} saved posts`);
+  showToast(`♥️ You have ${favorites.length} saved posts`);
 }
 
 // Open modal helper
@@ -2787,9 +3068,7 @@ function openModal(modalId) {
 
 // Start new session
 function clearSession() {
-  if (confirm('Start a new anonymous session? Your current identity will be forgotten.')) {
-    location.reload();
-  }
+  location.reload();
 }
 
 // Track stats
@@ -2854,7 +3133,7 @@ async function exportAllData() {
   link.click();
   URL.revokeObjectURL(url);
   
-  alert(`✓ Data exported:\n• Posts: ${dataExport.forum.posts}\n• Replies: ${dataExport.forum.replies}\n• Forums: ${dataExport.forum.forums}`);
+  showToast(`✓ Data exported:\n• Posts: ${dataExport.forum.posts}\n• Replies: ${dataExport.forum.replies}\n• Forums: ${dataExport.forum.forums}`);
 }
 
 async function importData() {
@@ -2871,7 +3150,7 @@ async function importData() {
       const imported = JSON.parse(text);
       
       if (!imported.data || !imported.data.posts) {
-        alert('Invalid backup file format');
+        showToast('Invalid backup file format');
         return;
       }
       
@@ -2884,10 +3163,10 @@ async function importData() {
         saveForumsToDatabase();
         
         renderPosts();
-        alert('✓ Data imported successfully');
+        showToast('✓ Data imported successfully');
       }
     } catch (error) {
-      alert('Error importing file: ' + error.message);
+      showToast('Error importing file: ' + error.message);
     }
   };
   
@@ -2895,11 +3174,7 @@ async function importData() {
 }
 
 async function clearAllData() {
-  if (!confirm('⚠️ This will permanently delete ALL data:\n• All posts and replies\n• Forum settings\n• Moderation data\n\nThis CANNOT be undone!')) {
-    return;
-  }
-  
-  if (!confirm('Are you absolutely sure? Type DELETE to confirm.')) {
+  if (!confirm('⚠️ Permanently delete ALL posts, replies and moderation data? This cannot be undone.')) {
     return;
   }
   
@@ -2922,7 +3197,7 @@ async function clearAllData() {
   await saveForumsToDatabase();
   
   renderPosts();
-  alert('✓ All data cleared');
+  showToast('✓ All data cleared');
 }
 
 function getStorageStatus() {
@@ -2990,18 +3265,18 @@ function hashPassword(password) {
 async function createUserAccount(username, password) {
   // Validation
   if (!username || username.length < 3) {
-    alert('❌ Username must be at least 3 characters');
+    showToast('❌ Username must be at least 3 characters');
     return false;
   }
   
   if (!password || password.length < 6) {
-    alert('❌ Password must be at least 6 characters');
+    showToast('❌ Password must be at least 6 characters');
     return false;
   }
   
   // Check if username already exists
   if (allUsers.some(u => u.username.toLowerCase() === username.toLowerCase())) {
-    alert('❌ Username already taken');
+    showToast('❌ Username already taken');
     return false;
   }
   
@@ -3045,14 +3320,14 @@ async function loginUser(username, password) {
   const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
   
   if (!user) {
-    alert('❌ Username not found');
+    showToast('❌ Username not found');
     return false;
   }
   
   const passwordHash = hashPassword(password);
   
   if (user.passwordHash !== passwordHash) {
-    alert('❌ Incorrect password');
+    showToast('❌ Incorrect password');
     return false;
   }
   
@@ -3082,7 +3357,7 @@ async function loginUser(username, password) {
   closeModal('login-modal');
   
   console.log('✓ Logged in as:', user.username);
-  alert('✓ Welcome back, ' + user.username);
+  showToast('✓ Welcome back, ' + user.username);
   return true;
 }
 
@@ -3124,34 +3399,31 @@ async function autoLoginUser(username, password) {
   updateLoginUI();
   
   console.log('✓ Auto-logged in as:', user.username);
-  alert('✓ Logged in as ' + user.username);
+  showToast('✓ Logged in as ' + user.username);
   return true;
 }
 
 // Logout user
 function logoutUser() {
-  if (confirm('Are you sure you want to logout?')) {
-    authenticatedUser = null;
-    
-    // 🔄 RESET SESSION NAME TO ANONYMOUS (generate new identity)
-    SESSION_NAME = genAnonName();
-    document.getElementById('session-id').textContent = SESSION_NAME;
-    document.getElementById('reply-anon-name').textContent = SESSION_NAME;
-    document.getElementById('new-anon-name').textContent = SESSION_NAME;
-    
-    localStorage.removeItem('lastLoggedInUsername');
-    updateLoginUI();
-    // closeProfilePanel();  // Commented if closeProfilePanel doesn't exist
-    
-    alert('✓ Logged out - new anonymous session started');
-    renderPosts();
-  }
+  authenticatedUser = null;
+  
+  // 🔄 RESET SESSION NAME TO ANONYMOUS (generate new identity)
+  SESSION_NAME = genAnonName();
+  document.getElementById('session-id').textContent = SESSION_NAME;
+  document.getElementById('reply-anon-name').textContent = SESSION_NAME;
+  document.getElementById('new-anon-name').textContent = SESSION_NAME;
+  
+  localStorage.removeItem('lastLoggedInUsername');
+  updateLoginUI();
+  
+  showToast('✓ Logged out — new anonymous session started');
+  renderPosts();
 }
 
 // Change username (for logged-in users) - updates display only, not identity
 function openChangeUsernameModal() {
   if (!authenticatedUser) {
-    alert('❌ Must be logged in');
+    showToast('❌ Must be logged in');
     return;
   }
   openModal('change-username-modal');
@@ -3159,26 +3431,26 @@ function openChangeUsernameModal() {
 
 function submitChangeUsername() {
   if (!authenticatedUser) {
-    alert('❌ Not logged in');
+    showToast('❌ Not logged in');
     return;
   }
   
   const newUsername = document.getElementById('change-username-input').value.trim();
   
   if (!newUsername || newUsername.length < 3) {
-    alert('❌ Username must be at least 3 characters');
+    showToast('❌ Username must be at least 3 characters');
     return;
   }
   
   // Check if new username is same as current
   if (newUsername.toLowerCase() === authenticatedUser.username.toLowerCase()) {
-    alert('❌ That is already your username');
+    showToast('❌ That is already your username');
     return;
   }
   
   // Check if username already exists
   if (allUsers.some(u => u.username.toLowerCase() === newUsername.toLowerCase())) {
-    alert('❌ Username already taken');
+    showToast('❌ Username already taken');
     return;
   }
   
@@ -3199,39 +3471,39 @@ function submitChangeUsername() {
   document.getElementById('change-username-input').value = '';
   closeModal('change-username-modal');
   
-  alert(`✓ Username changed from "${oldUsername}" to "${newUsername}"\n\n(Your anonymous identity remains: ${authenticatedUser.anonID})`);
+  showToast(`✓ Username changed to "${newUsername}"`);
 }
 async function changePassword(oldPassword, newPassword, confirmPassword) {
   if (!authenticatedUser) {
-    alert('❌ Not logged in');
+    showToast('❌ Not logged in');
     return false;
   }
   
   if (hashPassword(oldPassword) !== authenticatedUser.passwordHash) {
-    alert('❌ Old password is incorrect');
+    showToast('❌ Old password is incorrect');
     return false;
   }
   
   if (newPassword !== confirmPassword) {
-    alert('❌ Passwords do not match');
+    showToast('❌ Passwords do not match');
     return false;
   }
   
   if (newPassword.length < 6) {
-    alert('❌ Password must be at least 6 characters');
+    showToast('❌ Password must be at least 6 characters');
     return false;
   }
   
   authenticatedUser.passwordHash = hashPassword(newPassword);
   await saveUsersToDatabase(allUsers);
-  alert('✓ Password changed successfully');
+  showToast('✓ Password changed successfully');
   return true;
 }
 
 // Add post to favorites
 async function addToFavorites(postId) {
   if (!authenticatedUser) {
-    alert('⚠️ Login to save favorites');
+    showToast('⚠️ Login to save favorites');
     return false;
   }
   
@@ -3276,7 +3548,7 @@ async function grantAdminPrivileges(username) {
   user.isAdmin = true;
   await saveUsersToDatabase(allUsers);
   console.log(`✅ Admin privileges granted to ${user.username}`);
-  alert(`✅ ${user.username} is now an ADMIN`);
+  showToast(`✅ ${user.username} is now an ADMIN`);
   return true;
 }
 
@@ -3292,7 +3564,7 @@ async function revokeAdminPrivileges(username) {
   user.isAdmin = false;
   await saveUsersToDatabase(allUsers);
   console.log(`✅ Admin privileges revoked from ${user.username}`);
-  alert(`✅ Admin privileges removed from ${user.username}`);
+  showToast(`✅ Admin privileges removed from ${user.username}`);
   return true;
 }
 
@@ -3305,7 +3577,7 @@ function isUserAdmin(username) {
 // ── MODERATOR REQUEST SYSTEM ──────────────────────────────────────────────
 function requestModeratorStatus(username, boardId, reason) {
   if (!username) {
-    alert('❌ Login required to request moderator status');
+    showToast('❌ Login required to request moderator status');
     return false;
   }
   
@@ -3411,44 +3683,13 @@ function updateLoginUI() {
   }
 }
 
-// Save users to IndexedDB
-async function saveUsersToDatabase(users) {
-  if (!db) return false;
-  return new Promise((resolve) => {
-    const transaction = db.transaction(['users'], 'readwrite');
-    const store = transaction.objectStore('users');
-    store.clear();
-    users.forEach(user => store.put(user));
-    transaction.oncomplete = () => {
-      // Only broadcast that users changed — do NOT trigger any post reload
-      syncToOtherTabs({ action: 'userUpdated' });
-      resolve(true);
-    };
-    transaction.onerror = () => resolve(false);
-  });
-}
-
-// Load users from IndexedDB
-async function loadUsersFromDatabase() {
-  if (!db) return [];
-  return new Promise((resolve) => {
-    const transaction = db.transaction(['users'], 'readonly');
-    const store = transaction.objectStore('users');
-    const request = store.getAll();
-    
-    request.onsuccess = () => {
-      resolve(request.result);
-    };
-  });
-}
-
 // Submit login form
 async function submitLogin() {
   const username = document.getElementById('login-username').value;
   const password = document.getElementById('login-password').value;
   
   if (!username || !password) {
-    alert('❌ Please enter username and password');
+    showToast('❌ Please enter username and password');
     return;
   }
   
@@ -3457,7 +3698,7 @@ async function submitLogin() {
     document.getElementById('login-password').value = '';
     closeModal('login-modal');
   } else {
-    alert('❌ Invalid username or password');
+    showToast('❌ Invalid username or password');
   }
 }
 
@@ -3468,7 +3709,7 @@ async function submitChangePassword() {
   const confirm = document.getElementById('confirm-new-password').value;
   
   if (!oldPass || !newPass || !confirm) {
-    alert('❌ Please fill all password fields');
+    showToast('❌ Please fill all password fields');
     return;
   }
   
@@ -3477,7 +3718,7 @@ async function submitChangePassword() {
     document.getElementById('new-password').value = '';
     document.getElementById('confirm-new-password').value = '';
     closeModal('change-password-modal');
-    alert('✓ Password changed successfully');
+    showToast('✓ Password changed successfully');
   }
 }
 
@@ -4027,13 +4268,64 @@ function resolveReport(reportId, forumId, action = 'delete') {
   return false;
 }
 
+// ── TABS & PAGINATION STATE ───────────────────────────────────────────
+let currentPage = 1;
+const PAGE_SIZE = 15;
+
+const BOARD_TABS = [
+  { id: 'all',         icon: '🌐', label: 'All'         },
+  { id: 'welcome',     icon: '👋', label: 'Welcome'     },
+  { id: 'faq',         icon: '❓', label: 'Getting Started' },
+  { id: 'tech',        icon: '💻', label: 'Technology'  },
+  { id: 'science',     icon: '🔬', label: 'Science'     },
+  { id: 'philosophy',  icon: '🧠', label: 'Philosophy'  },
+  { id: 'politics',    icon: '🗳️', label: 'Politics'    },
+  { id: 'creative',    icon: '🎨', label: 'Creative'    },
+  { id: 'confessions', icon: '👁️', label: 'Confessions' },
+  { id: 'advice',      icon: '💬', label: 'Advice'      },
+  { id: 'random',      icon: '🎲', label: 'Random'      },
+];
+
+function renderBoardTabs() {
+  const wrap = document.getElementById('board-tabs');
+  if (!wrap) return;
+  wrap.innerHTML = BOARD_TABS.map(t => {
+    const count = t.id === 'all' ? posts.length : posts.filter(p => p.board === t.id).length;
+    return `<button class="board-tab${currentBoard === t.id ? ' active' : ''}"
+      role="tab" aria-selected="${currentBoard === t.id}"
+      onclick="switchBoardTab('${t.id}','${t.icon}','${t.label}')">
+      ${t.icon} ${t.label} <span style="font-size:0.65rem;opacity:0.55;margin-left:3px;">${count}</span>
+    </button>`;
+  }).join('');
+}
+
+function switchBoardTab(boardId, icon, label) {
+  currentBoard = boardId;
+  currentPage = 1;
+  trackBoardVisited(boardId);
+
+  // Sync sidebar highlight
+  document.querySelectorAll('.topic-item').forEach(el => el.classList.remove('active'));
+  const sidebarMatch = [...document.querySelectorAll('.topic-item')].find(el =>
+    el.getAttribute('onclick') && el.getAttribute('onclick').includes(`'${boardId}'`));
+  if (sidebarMatch) sidebarMatch.classList.add('active');
+
+  const boardInfo = BOARD_TABS.find(t => t.id === boardId) || { icon, label, id: boardId };
+  const desc = boardId === 'all' ? 'Everything, everywhere, all at once.'
+    : (BOARDS[boardId]?.desc || '');
+  document.getElementById('board-title').innerHTML = `<span class="icon">${boardInfo.icon || icon}</span>${boardInfo.label || label}`;
+  document.getElementById('board-desc').textContent = desc;
+
+  renderPosts();
+  if (window.innerWidth <= 768) closeSidebar();
+}
+
 // ── RENDER ──────────────────────────────────────────────────────────────
 function renderPosts() {
   // Safety check: ensure forums array includes all BOARDS
   const forumIds = new Set(forums.map(f => f.id));
   const boardIds = Object.keys(BOARDS);
   
-  // Add any missing boards from BOARDS constant
   boardIds.forEach(key => {
     if (!forumIds.has(key)) {
       forums.push({
@@ -4061,6 +4353,9 @@ function renderPosts() {
     }));
     saveForumsToDatabase();
   }
+
+  // Render tabs
+  renderBoardTabs();
   
   let filtered = currentBoard === 'all' ? [...posts] : posts.filter(p=>p.board===currentBoard);
 
@@ -4068,9 +4363,15 @@ function renderPosts() {
   else if (currentSort === 'new') filtered.sort((a,b)=>b.time-a.time);
   else if (currentSort === 'top') filtered.sort((a,b)=>b.views-a.views);
 
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  if (currentPage > totalPages) currentPage = totalPages;
+  const startIdx = (currentPage - 1) * PAGE_SIZE;
+  const pagePosts = filtered.slice(startIdx, startIdx + PAGE_SIZE);
+
   const list = document.getElementById('posts-list');
-  list.innerHTML = filtered.map(p => {
-    const board = BOARDS[p.board];
+  list.innerHTML = pagePosts.map(p => {
+    const board = BOARDS[p.board] || { icon: '📋', name: p.board || 'General' };
     const tags = [];
     if (p.pinned) tags.push('<span class="post-tag tag-pin">📌 Pinned</span>');
     if (p.hot) tags.push('<span class="post-tag tag-hot">🔥 Hot</span>');
@@ -4104,11 +4405,42 @@ function renderPosts() {
   }).join('');
 
   document.getElementById('stat-posts').textContent = filtered.length;
+
+  // Render pagination
+  const pgWrap = document.getElementById('posts-pagination');
+  if (totalPages <= 1) {
+    pgWrap.style.display = 'none';
+  } else {
+    pgWrap.style.display = 'flex';
+    let pages = '';
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 1) {
+        pages += `<button class="page-btn${i===currentPage?' active':''}" onclick="goToPage(${i})">${i}</button>`;
+      } else if (Math.abs(i - currentPage) === 2) {
+        pages += `<span class="page-info">…</span>`;
+      }
+    }
+    pgWrap.innerHTML = `
+      <button class="page-btn" onclick="goToPage(${currentPage-1})" ${currentPage===1?'disabled':''}>← Prev</button>
+      ${pages}
+      <button class="page-btn" onclick="goToPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>Next →</button>
+    `;
+  }
+}
+
+function goToPage(page) {
+  const filtered = currentBoard === 'all' ? posts : posts.filter(p => p.board === currentBoard);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  if (page < 1 || page > totalPages) return;
+  currentPage = page;
+  renderPosts();
+  document.getElementById('posts-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ── NAVIGATION ───────────────────────────────────────────────────────────
 function selectTopic(board, icon, name, desc) {
   currentBoard = board;
+  currentPage = 1;
   trackBoardVisited(board);
   document.querySelectorAll('.topic-item').forEach(el => el.classList.remove('active'));
   event.currentTarget.classList.add('active');
@@ -4120,6 +4452,7 @@ function selectTopic(board, icon, name, desc) {
 
 function setSort(btn, sort) {
   currentSort = sort;
+  currentPage = 1;
   document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderPosts();
@@ -4496,7 +4829,7 @@ function submitNewForum() {
   const desc = document.getElementById('new-forum-desc').value.trim();
 
   if (!id || !name || !desc) {
-    alert('Please fill in all fields');
+    showToast('Please fill in all fields');
     return;
   }
 
@@ -4504,9 +4837,9 @@ function submitNewForum() {
     document.getElementById('new-forum-id').value = '';
     document.getElementById('new-forum-name').value = '';
     document.getElementById('new-forum-desc').value = '';
-    alert('✓ Forum created successfully!');
+    showToast('✓ Forum created successfully!');
   } else {
-    alert('Forum ID already exists');
+    showToast('Forum ID already exists');
   }
 }
 
@@ -4515,21 +4848,21 @@ function promoteModUser() {
   const forum = forums.find(f => f.id === currentBoard);
 
   if (!forum) {
-    alert('Select a board first');
+    showToast('Select a board first');
     return;
   }
 
   if (!username) {
-    alert('Enter a username');
+    showToast('Enter a username');
     return;
   }
 
   if (promoteModerator(currentBoard, username)) {
     document.getElementById('manage-username').value = '';
-    alert(`✓ ${username} is now a moderator`);
+    showToast(`✓ ${username} is now a moderator`);
     updateReportsList();
   } else {
-    alert('User is already a moderator or does not exist');
+    showToast('User is already a moderator or does not exist');
   }
 }
 
@@ -4538,28 +4871,28 @@ function banModUser() {
   const reason = prompt('Reason for ban:');
 
   if (!username) {
-    alert('Enter a username');
+    showToast('Enter a username');
     return;
   }
 
   if (!reason) {
-    alert('Enter a reason for the ban');
+    showToast('Enter a reason for the ban');
     return;
   }
 
   const forum = forums.find(f => f.id === currentBoard);
   if (!forum) {
-    alert('Select a board first');
+    showToast('Select a board first');
     return;
   }
 
   if (banUserFromForum(currentBoard, username, reason)) {
     document.getElementById('manage-username').value = '';
-    alert(`✓ ${username} has been banned`);
+    showToast(`✓ ${username} has been banned`);
     renderPosts();
     updateReportsList();
   } else {
-    alert('User is already banned or does not exist');
+    showToast('User is already banned or does not exist');
   }
 }
 
@@ -4573,7 +4906,7 @@ function submitPostReport() {
   const desc = document.getElementById('report-description').value;
 
   if (!reason) {
-    alert('Please select a reason');
+    showToast('Please select a reason');
     return;
   }
 
@@ -4581,7 +4914,7 @@ function submitPostReport() {
     document.getElementById('report-reason').value = '';
     document.getElementById('report-description').value = '';
     closeModal('report-modal');
-    alert('✓ Report submitted. Moderators will review it shortly.');
+    showToast('✓ Report submitted. Moderators will review it shortly.');
   }
 }
 
@@ -4596,7 +4929,7 @@ function submitReplyReport() {
   const desc = document.getElementById('report-reply-description').value;
 
   if (!reason) {
-    alert('Please select a reason');
+    showToast('Please select a reason');
     return;
   }
 
@@ -4604,7 +4937,7 @@ function submitReplyReport() {
     document.getElementById('report-reply-reason').value = '';
     document.getElementById('report-reply-description').value = '';
     closeModal('report-reply-modal');
-    alert('✓ Report submitted. Moderators will review it shortly.');
+    showToast('✓ Report submitted. Moderators will review it shortly.');
   }
 }
 
@@ -4955,18 +5288,18 @@ function rejectModRequest(requestId) {
 function adminGrantAdmin() {
   const username = document.getElementById('admin-profile-manage-username').value.trim();
   if (!username) {
-    alert('Enter a username');
+    showToast('Enter a username');
     return;
   }
   
   const user = getUserByUsername(username);
   if (!user) {
-    alert('User not found');
+    showToast('User not found');
     return;
   }
   
   if (user.isAdmin) {
-    alert(`${username} is already an admin`);
+    showToast(`${username} is already an admin`);
     return;
   }
   
@@ -4981,23 +5314,23 @@ function adminGrantAdmin() {
 function adminRevokeAdmin() {
   const username = document.getElementById('admin-profile-manage-username').value.trim();
   if (!username) {
-    alert('Enter a username');
+    showToast('Enter a username');
     return;
   }
   
   if (username === SESSION_NAME) {
-    alert('❌ You cannot revoke your own admin rights');
+    showToast('❌ You cannot revoke your own admin rights');
     return;
   }
   
   const user = getUserByUsername(username);
   if (!user) {
-    alert('User not found');
+    showToast('User not found');
     return;
   }
   
   if (!user.isAdmin) {
-    alert(`${username} is not an admin`);
+    showToast(`${username} is not an admin`);
     return;
   }
   
@@ -5015,13 +5348,13 @@ function adminChangeAnonID() {
   const newAnonID = document.getElementById('admin-change-anonid-new').value.trim();
   
   if (!username) {
-    alert('Enter username');
+    showToast('Enter username');
     return;
   }
   
   const user = getUserByUsername(username);
   if (!user) {
-    alert('User not found');
+    showToast('User not found');
     return;
   }
   
@@ -5031,7 +5364,7 @@ function adminChangeAnonID() {
   if (newAnonID) {
     // Check if format is valid (ANON_*_****)
     if (!newAnonID.startsWith('ANON_')) {
-      alert('❌ ID must start with ANON_');
+      showToast('❌ ID must start with ANON_');
       return;
     }
     user.anonID = newAnonID;
@@ -5050,7 +5383,7 @@ function adminChangeAnonID() {
   showToast(`✓ ${username}'s ID changed: ${oldAnonID} → ${user.anonID}`);
   updateAdminProfileList();
   
-  alert(`✓ Updated ${username}\n\nOld ID: ${oldAnonID}\nNew ID: ${user.anonID}\n\nNote: Posts created after this change will show new ID. Old posts remain unchanged.`);
+  showToast(`✓ Updated ${username}\n\nOld ID: ${oldAnonID}\nNew ID: ${user.anonID}\n\nNote: Posts created after this change will show new ID. Old posts remain unchanged.`);
 }
 
 function submitModeratorRequest() {
@@ -5058,17 +5391,17 @@ function submitModeratorRequest() {
   const reason = document.getElementById('request-mod-reason').value.trim();
   
   if (!SESSION_NAME) {
-    alert('❌ Must be logged in to request moderator status');
+    showToast('❌ Must be logged in to request moderator status');
     return;
   }
   
   if (!boardId) {
-    alert('Select a board');
+    showToast('Select a board');
     return;
   }
   
   if (!reason) {
-    alert('Tell us why you want to be a moderator');
+    showToast('Tell us why you want to be a moderator');
     return;
   }
   
@@ -5304,7 +5637,7 @@ function generateSQLDump() {
 // Trigger a manual SQL file download
 async function downloadSQLFile() {
   if (!sqlDB) {
-    alert('⚠️ SQLite database is not ready yet. Please wait a moment and try again.');
+    showToast('⚠️ SQLite database is not ready yet. Please wait a moment and try again.');
     return;
   }
   await syncToSQLite();
