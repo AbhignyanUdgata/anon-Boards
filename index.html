@@ -78,29 +78,22 @@
 <link rel="canonical" href="https://anon-boards.netlify.app">
 <style>
   :root {
-    --bg: #ffe5bb;
-    --surface: rgba(255, 229, 187, 0.75);
-    --surface2: rgba(255, 210, 150, 0.55);
-    --border: rgba(106, 158, 160, 0.28);
-    --border-strong: rgba(106, 158, 160, 0.50);
-    --accent: #7a5c1e;
-    --accent-warm: #6a9ea0;
-    --accent2: #c0392b;
-    --accent3: #2471a3;
-    --text: #2c1a00;
-    --muted: #8a6030;
-    --danger: #c0392b;
-    --gold: #6a9ea0;
-    --gold-light: rgba(221, 239, 239, 0.18);
+    --bg: #ffffff;
+    --surface: #f8f9fa;
+    --surface2: #e9ecef;
+    --border: #dee2e6;
+    --accent: #6c757d;
+    --accent2: #e91e8c;
+    --accent3: #4da6ff;
+    --text: #212529;
+    --muted: #6c757d;
+    --danger: #dc3545;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     background: var(--bg);
-    background-image:
-      radial-gradient(ellipse at 0% 0%, rgba(255, 200, 100, 0.22) 0%, transparent 55%),
-      radial-gradient(ellipse at 100% 100%, rgba(200, 140, 40, 0.12) 0%, transparent 55%);
     color: var(--text);
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
@@ -109,95 +102,50 @@
 
   /* HEADER */
   header {
-    border-bottom: 1px solid var(--border-strong);
+    border-bottom: 1px solid var(--border);
     padding: 0 2rem;
     position: sticky;
     top: 0;
-    background: rgba(255, 229, 187, 0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: var(--bg);
     z-index: 100;
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: 60px;
-    /* Decorative bottom shimmer line */
-    box-shadow:
-      0 1px 0 rgba(106, 158, 160, 0.5),
-      0 2px 16px rgba(106, 158, 160, 0.08);
   }
-
-  /* Decorative header corner ornaments */
-  header::before,
-  header::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    width: 60px;
-    height: 2px;
-    background: linear-gradient(90deg, #6a9ea0, transparent);
-  }
-  header::before { left: 0; }
-  header::after { right: 0; transform: scaleX(-1); }
 
   .logo {
-    font-family: 'Syne', 'Inter', sans-serif;
-    font-weight: 800;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
     font-size: 1.2rem;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     color: var(--text);
-    position: relative;
   }
 
-  .logo span { color: var(--accent-warm); }
-
-  /* Subtle dot decoration beside logo */
-  .logo-wrap {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  .logo-ornament {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    opacity: 0.45;
-  }
-  .logo-ornament span {
-    display: block;
-    height: 2px;
-    border-radius: 1px;
-    background: var(--accent-warm);
-  }
-  .logo-ornament span:nth-child(1) { width: 18px; }
-  .logo-ornament span:nth-child(2) { width: 12px; }
-  .logo-ornament span:nth-child(3) { width: 6px; }
+  .logo span { color: var(--muted); }
 
   .anon-badge {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     color: var(--muted);
-    border: 1px solid var(--border-strong);
-    background: rgba(255, 220, 160, 0.5);
-    padding: 0.3rem 0.75rem;
-    border-radius: 20px;
-    letter-spacing: 0.03em;
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
   }
 
   .dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #3aaa5c;
+    background: #28a745;
     flex-shrink: 0;
-    box-shadow: 0 0 6px rgba(58, 170, 92, 0.6);
     animation: dotPulse 2s ease-in-out infinite;
   }
   @keyframes dotPulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(58,170,92,0.6); }
-    50% { opacity: 0.5; box-shadow: 0 0 2px rgba(58,170,92,0.2); }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
   }
 
   /* LAYOUT */
@@ -213,181 +161,83 @@
 
   /* SIDEBAR */
   .sidebar {
-    border-right: 1px solid var(--border-strong);
-    padding: 0;
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 0;
     position: sticky;
     top: 60px;
     height: calc(100vh - 60px);
     overflow-y: auto;
-    background: rgba(221, 239, 239, 0.55);
-    background-image:
-      linear-gradient(180deg, rgba(221, 239, 239, 0.4) 0%, transparent 120px),
-      repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 28px,
-        rgba(106, 158, 160, 0.04) 28px,
-        rgba(106, 158, 160, 0.04) 29px
-      );
-    box-shadow: inset -1px 0 0 rgba(106, 158, 160, 0.25);
-  }
-
-  /* Sidebar decorative top banner */
-  .sidebar-top-banner {
-    padding: 1.1rem 1.5rem 1rem;
-    border-bottom: 1px solid var(--border-strong);
-    margin-bottom: 0.5rem;
-    position: relative;
-    background: linear-gradient(135deg, rgba(221, 239, 239, 0.55) 0%, rgba(221, 239, 239, 0.15) 100%);
-    overflow: hidden;
-  }
-  /* Corner filigree */
-  .sidebar-top-banner::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #6a9ea0 30%, #9ecece 50%, #6a9ea0 70%, transparent);
-  }
-  .sidebar-top-banner::after {
-    content: '◈';
-    position: absolute;
-    bottom: -1px; right: 1.2rem;
-    font-size: 0.55rem;
-    color: #6a9ea0;
-    opacity: 0.7;
-    transform: translateY(50%);
-    background: rgba(221, 239, 239, 0.95);
-    padding: 0 0.2rem;
-  }
-  .sidebar-brand {
-    font-family: 'Syne', 'Inter', sans-serif;
-    font-weight: 800;
-    font-size: 0.78rem;
-    letter-spacing: 0.14em;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 0.35rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .sidebar-brand-dot {
-    width: 4px; height: 4px;
-    border-radius: 50%;
-    background: #6a9ea0;
-    display: inline-block;
-  }
-  .sidebar-tagline {
-    font-size: 0.65rem;
-    color: var(--muted);
-    letter-spacing: 0.04em;
-    line-height: 1.4;
-    opacity: 0.8;
-  }
-  /* Decorative horizontal rules */
-  .sidebar-rule {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0 1.5rem;
-    margin: 0.2rem 0 0.6rem;
-  }
-  .sidebar-rule::before,
-  .sidebar-rule::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border-strong));
-  }
-  .sidebar-rule::after {
-    background: linear-gradient(90deg, var(--border-strong), transparent);
-  }
-  .sidebar-rule-dot {
-    width: 4px; height: 4px;
-    border-radius: 50%;
-    background: #6a9ea0;
-    opacity: 0.5;
-    flex-shrink: 0;
+    background: var(--surface);
   }
 
   .sidebar::-webkit-scrollbar { width: 4px; }
   .sidebar::-webkit-scrollbar-track { background: transparent; }
-  .sidebar::-webkit-scrollbar-thumb { background: rgba(106,158,160,0.3); border-radius: 2px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  .sidebar-section { margin-bottom: 1.5rem; padding-top: 0.5rem; }
+  .sidebar-section { margin-bottom: 2rem; }
 
   .sidebar-label {
-    font-size: 0.65rem;
-    letter-spacing: 0.12em;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
     color: var(--muted);
     padding: 0 1.5rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     text-transform: uppercase;
-    font-weight: 700;
-    opacity: 0.7;
+    font-weight: 600;
   }
 
   .topic-item {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.55rem 1.5rem;
+    padding: 0.6rem 1.5rem;
     cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
+    transition: background 0.15s;
     border-left: 2px solid transparent;
-    font-size: 0.84rem;
+    font-size: 0.85rem;
   }
 
   .topic-item:hover {
-    background: rgba(221, 239, 239, 0.55);
-    border-left-color: #6a9ea0;
+    background: var(--surface2);
+    border-left-color: var(--accent);
     color: var(--text);
   }
 
   .topic-item.active {
-    background: rgba(221, 239, 239, 0.7);
-    border-left-color: #6a9ea0;
+    background: var(--surface2);
+    border-left-color: var(--accent);
     color: var(--text);
-    font-weight: 600;
   }
 
   .topic-icon { font-size: 1rem; width: 20px; text-align: center; }
 
   .topic-count {
     margin-left: auto;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     color: var(--muted);
-    background: rgba(221, 239, 239, 0.7);
-    border: 1px solid rgba(106, 158, 160, 0.35);
-    padding: 0.1rem 0.45rem;
-    border-radius: 8px;
-    font-weight: 600;
+    background: var(--bg);
+    padding: 0.1rem 0.4rem;
+    border-radius: 2px;
   }
 
   .new-topic-btn {
-    margin: 0.5rem 1.5rem 0;
+    margin: 0 1.5rem;
     padding: 0.65rem;
-    background: linear-gradient(135deg, rgba(221,239,239,0.55), rgba(221,239,239,0.25));
-    border: 1px solid var(--border-strong);
+    background: transparent;
+    border: 1px solid var(--accent);
     color: var(--accent);
     font-family: 'Inter', sans-serif;
-    font-size: 0.78rem;
-    font-weight: 700;
+    font-size: 0.8rem;
     cursor: pointer;
     width: calc(100% - 3rem);
-    letter-spacing: 0.07em;
-    transition: all 0.18s;
+    letter-spacing: 0.05em;
+    transition: all 0.15s;
     text-transform: uppercase;
-    border-radius: 6px;
   }
 
   .new-topic-btn:hover {
     background: var(--accent);
     color: var(--bg);
-    border-color: var(--accent);
-    box-shadow: 0 4px 12px rgba(122, 92, 30, 0.25);
-    transform: translateY(-1px);
   }
 
   /* CONTENT AREA */
@@ -535,27 +385,6 @@
   }
 
   .post-stat svg { width: 12px; height: 12px; }
-
-  .bookmark-btn {
-    border: 1px solid transparent;
-    color: var(--accent);
-    background: rgba(221, 239, 239, 0.4);
-    border-radius: 999px;
-    padding: 0.35rem 0.9rem;
-    font-size: 0.7rem;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    white-space: nowrap;
-  }
-  .bookmark-btn:hover {
-    background: rgba(221, 239, 239, 0.65);
-    border-color: var(--accent);
-  }
-  .bookmark-btn.active {
-    background: rgba(122, 92, 30, 0.12);
-    border-color: rgba(122, 92, 30, 0.2);
-    color: var(--accent); 
-  }
 
   /* MODAL / THREAD VIEW */
   .overlay {
@@ -1846,7 +1675,7 @@
   /* Skip-to-content link for accessibility */
   .skip-link {
     position: absolute; top: -100px; left: 1rem; z-index: 10000;
-    background: #2c1a00; color: #ffe5bb; padding: 0.5rem 1rem;
+    background: #212529; color: #fff; padding: 0.5rem 1rem;
     font-size: 0.85rem; border-radius: 0 0 4px 4px;
     transition: top 0.2s;
   }
@@ -1854,305 +1683,32 @@
 </style>
 
 <style>
-/* ── PROFILE PANEL ───────────────────────────────────────────────────── */
-#profile-panel {
-  position: fixed;
-  right: 0; top: 60px;
-  width: 320px;
-  height: calc(100vh - 60px);
-  overflow-y: auto;
-  z-index: 140;
-  background: linear-gradient(175deg, rgba(255,229,187,0.97) 0%, rgba(255,210,145,0.97) 100%);
-  border-left: 1px solid var(--border-strong);
-  box-shadow: -8px 0 32px rgba(106, 158, 160, 0.15);
-  scrollbar-width: thin;
-  scrollbar-color: rgba(190,140,70,0.3) transparent;
-  animation: ppSlideIn 0.25s cubic-bezier(0.34,1.4,0.64,1);
-}
-@keyframes ppSlideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to   { transform: translateX(0);    opacity: 1; }
-}
-#profile-section {
-  padding: 0 0 1.5rem;
-}
-.pp-avatar-wrap {
-  background: linear-gradient(135deg, rgba(212,160,23,0.25) 0%, rgba(180,120,20,0.12) 100%);
-  border-bottom: 1px solid var(--border-strong);
-  padding: 2rem 1.5rem 1.5rem;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-/* subtle corner dots */
-.pp-avatar-wrap::before {
-  content: '◆  ◆  ◆';
-  position: absolute;
-  top: 0.5rem; left: 0; right: 0;
-  text-align: center;
-  font-size: 0.35rem;
-  letter-spacing: 0.6rem;
-  color: var(--gold);
-  opacity: 0.4;
-}
-.pp-avatar-wrap::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #6a9ea0 40%, #9ecece 60%, transparent);
-}
-.pp-avatar-ring {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 80px; height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255,229,187,0.9), rgba(255,200,100,0.5));
-  border: 2px solid rgba(212,160,23,0.5);
-  box-shadow:
-    0 0 0 4px rgba(212,160,23,0.12),
-    0 8px 24px rgba(180,120,20,0.2);
-  margin-bottom: 0.85rem;
-  position: relative;
-}
-.pp-avatar {
-  font-size: 2.4rem;
-  line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12));
-}
-.pp-id-chip {
-  display: inline-block;
-  font-family: 'Space Grotesk', monospace;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--accent);
-  background: rgba(255,229,187,0.8);
-  border: 1px solid var(--border-strong);
-  border-radius: 20px;
-  padding: 0.2rem 0.75rem;
-}
-.pp-name-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 1rem 1.5rem 0.25rem;
-}
-.pp-username {
-  font-family: 'Syne', 'Inter', sans-serif;
-  font-weight: 800;
-  font-size: 1.15rem;
-  color: var(--text);
-  letter-spacing: -0.01em;
-}
-.pp-online-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: #3aaa5c;
-  box-shadow: 0 0 6px rgba(58,170,92,0.5);
-  flex-shrink: 0;
-  animation: dotPulse 2s ease-in-out infinite;
-}
-.pp-since {
-  text-align: center;
-  font-size: 0.72rem;
-  color: var(--muted);
-  margin-bottom: 1.25rem;
-  padding: 0 1.5rem;
-}
-.pp-admin-badge {
-  margin: 0 1.5rem 1rem;
-  padding: 0.6rem 1rem;
-  background: linear-gradient(135deg, rgba(192,57,43,0.12), rgba(192,57,43,0.06));
-  border: 1px solid rgba(192,57,43,0.3);
-  border-radius: 8px;
-  text-align: center;
-  color: var(--accent2);
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-}
-.pp-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.6rem;
-  padding: 0 1.5rem;
-  margin-bottom: 1.25rem;
-}
-.pp-stat-card {
-  background: rgba(255,229,187,0.7);
-  border: 1px solid var(--border-strong);
-  border-radius: 10px;
-  padding: 0.85rem 0.5rem;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(180,120,20,0.08);
-}
-.pp-stat-val {
-  font-family: 'Syne', 'Inter', sans-serif;
-  font-weight: 800;
-  font-size: 1.35rem;
-  color: var(--accent);
-  line-height: 1;
-  margin-bottom: 0.3rem;
-}
-.pp-stat-label {
-  font-size: 0.62rem;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 600;
-}
-.pp-close-btn {
-  display: block;
-  width: calc(100% - 3rem);
-  margin: 0 1.5rem;
-  padding: 0.7rem;
-  background: rgba(122,92,30,0.1);
-  border: 1px solid var(--border-strong);
-  color: var(--accent);
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 0.8rem;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.18s;
-}
-.pp-close-btn:hover {
-  background: var(--accent);
-  color: var(--bg);
-}
-/* Admin subsection */
-.pp-admin-section {
-  border-top: 1px solid var(--border-strong);
-  padding: 1.25rem 1.5rem;
-}
-.pp-section-title {
-  font-family: 'Syne', 'Inter', sans-serif;
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.pp-admin-card {
-  background: rgba(255,229,187,0.55);
-  border: 1px solid var(--border-strong);
-  border-radius: 10px;
-  padding: 0.9rem 1rem;
-  margin-bottom: 0.75rem;
-  box-shadow: 0 1px 4px rgba(180,120,20,0.06);
-}
-.pp-admin-card-title {
-  font-weight: 700;
-  font-size: 0.76rem;
-  color: var(--text);
-  margin-bottom: 0.2rem;
-  letter-spacing: 0.04em;
-}
-.pp-admin-card-sub {
-  font-size: 0.7rem;
-  color: var(--muted);
-  margin-bottom: 0.6rem;
-}
-.pp-admin-input {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  margin-bottom: 0.45rem;
-  background: rgba(255,229,187,0.8);
-  border: 1px solid var(--border-strong);
-  color: var(--text);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.82rem;
-  border-radius: 6px;
-  outline: none;
-  transition: border-color 0.15s;
-}
-.pp-admin-input:focus { border-color: var(--accent-warm); }
-.pp-admin-btn {
-  display: block;
-  width: 100%;
-  padding: 0.5rem;
-  border: none;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 0.76rem;
-  border-radius: 6px;
-  margin-bottom: 0.35rem;
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.04em;
-  transition: all 0.15s;
-}
-.pp-btn-blue { background: rgba(36,113,163,0.15); color: var(--accent3); border: 1px solid rgba(36,113,163,0.3); }
-.pp-btn-blue:hover { background: var(--accent3); color: #fff; }
-.pp-btn-red  { background: rgba(192,57,43,0.12);  color: var(--danger); border: 1px solid rgba(192,57,43,0.3); }
-.pp-btn-red:hover  { background: var(--danger); color: #fff; }
-.pp-btn-gold { background: var(--gold-light); color: var(--accent); border: 1px solid rgba(212,160,23,0.35); }
-.pp-btn-gold:hover { background: var(--accent); color: var(--bg); }
-.pp-sys-stats { display: flex; flex-direction: column; gap: 0.3rem; }
-.pp-sys-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.8rem;
-  padding: 0.3rem 0;
-  border-bottom: 1px solid rgba(190,140,70,0.12);
-}
-.pp-sys-row:last-child { border-bottom: none; }
-.pp-sys-row span:first-child { color: var(--muted); }
-.pp-sys-row span:last-child  { font-weight: 700; color: var(--accent); }
-
-<style>
 /* ── AUTH MODAL REDESIGN ─────────────────────────────────────────────── */
 .auth-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(20, 20, 30, 0.3);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(10,10,15,0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   z-index: 500;
-  padding: 1.5rem;
-  visibility: hidden;
-  pointer-events: none;
-  opacity: 0;
-}
-.auth-overlay.open {
-  display: flex;
   align-items: center;
   justify-content: center;
-  visibility: visible;
-  pointer-events: auto;
-  opacity: 1;
-  animation: authFadeIn 0.22s ease;
+  padding: 1.5rem;
 }
+.auth-overlay.open { display: flex; animation: authFadeIn 0.22s ease; }
 @keyframes authFadeIn { from { opacity:0; } to { opacity:1; } }
 
 .auth-card {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: #0f1117;
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 16px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06);
+  animation: authSlideUp 0.28s cubic-bezier(0.34,1.56,0.64,1);
   overflow: hidden;
   position: relative;
-  visibility: hidden;
-  opacity: 0;
-  transform: translateY(40px) scale(0.97);
-}
-.auth-overlay.open .auth-card {
-  visibility: visible;
-  opacity: 1;
-  animation: authSlideUp 0.28s cubic-bezier(0.34,1.56,0.64,1);
 }
 @keyframes authSlideUp {
   from { transform: translateY(40px) scale(0.97); opacity:0; }
@@ -2165,7 +1721,7 @@
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 2px;
-  background: linear-gradient(90deg, #1a73e8 0%, #34a853 40%, #1a73e8 100%);
+  background: linear-gradient(90deg, #6c757d 0%, #adb5bd 40%, #6c757d 100%);
 }
 
 .auth-card-header {
@@ -2177,24 +1733,24 @@
   align-items: center;
   justify-content: center;
   width: 52px; height: 52px;
-  background: linear-gradient(135deg, rgba(26,115,232,0.2) 0%, rgba(52,169,83,0.15) 100%);
+  background: linear-gradient(135deg, #343a40 0%, #212529 100%);
   border-radius: 14px;
-  border: 1px solid rgba(26,115,232,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
   margin-bottom: 1.1rem;
   font-size: 1.6rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
 .auth-card-title {
   font-family: 'Syne', sans-serif;
   font-weight: 800;
   font-size: 1.45rem;
-  color: #1a1a1a;
+  color: #f8f9fa;
   letter-spacing: -0.02em;
   margin-bottom: 0.3rem;
 }
 .auth-card-sub {
   font-size: 0.78rem;
-  color: #4a4a4a;
+  color: #6c757d;
   line-height: 1.5;
 }
 
@@ -2207,22 +1763,22 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #2c2c2c;
+  color: #6c757d;
   margin-bottom: 0.45rem;
 }
 .auth-input {
   width: 100%;
-  background: rgba(255,255,255,0.5);
-  border: 1px solid rgba(0,0,0,0.2);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 8px;
-  color: #1a1a1a;
+  color: #f8f9fa;
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.92rem;
   padding: 0.75rem 1rem;
   outline: none;
   transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
 }
-.auth-input::placeholder { color: #707070; }
+.auth-input::placeholder { color: #495057; }
 .auth-input:focus {
   border-color: rgba(173,181,189,0.5);
   background: rgba(255,255,255,0.07);
@@ -2265,7 +1821,7 @@
   align-items: center;
   gap: 0.75rem;
   margin: 1.2rem 0;
-  color: #707070;
+  color: #495057;
   font-size: 0.7rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -2275,16 +1831,16 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: rgba(0,0,0,0.1);
+  background: rgba(255,255,255,0.07);
 }
 
 .auth-notice {
-  background: rgba(0,0,0,0.06);
-  border: 1px solid rgba(0,0,0,0.12);
+  background: rgba(108,117,125,0.08);
+  border: 1px solid rgba(108,117,125,0.15);
   border-radius: 8px;
   padding: 0.75rem 1rem;
   font-size: 0.75rem;
-  color: #2c2c2c;
+  color: #6c757d;
   line-height: 1.55;
   display: flex;
   gap: 0.6rem;
@@ -2296,25 +1852,25 @@
   text-align: center;
   margin-top: 1.3rem;
   font-size: 0.78rem;
-  color: #4a4a4a;
+  color: #6c757d;
 }
 .auth-switch a {
-  color: #1a73e8;
+  color: #adb5bd;
   text-decoration: none;
   font-weight: 600;
-  border-bottom: 1px solid rgba(26,115,232,0.3);
+  border-bottom: 1px solid rgba(173,181,189,0.3);
   transition: color 0.15s, border-color 0.15s;
 }
-.auth-switch a:hover { color: #1560c0; border-color: rgba(26,115,232,0.5); }
+.auth-switch a:hover { color: #f8f9fa; border-color: rgba(248,249,250,0.4); }
 
 .auth-close {
   position: absolute;
   top: 1.1rem; right: 1.1rem;
   width: 30px; height: 30px;
-  background: rgba(0,0,0,0.05);
-  border: 1px solid rgba(0,0,0,0.1);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 6px;
-  color: #4a4a4a;
+  color: #6c757d;
   cursor: pointer;
   font-size: 0.9rem;
   display: flex; align-items: center; justify-content: center;
@@ -2416,15 +1972,7 @@
     <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
       <span></span><span></span><span></span>
     </button>
-    <div class="logo-wrap">
-      <div class="logo-ornament">
-        <span></span><span></span><span></span>
-      </div>
-      <div class="logo">ANON<span>·</span>BOARDS</div>
-      <div class="logo-ornament" style="transform:scaleX(-1)">
-        <span></span><span></span><span></span>
-      </div>
-    </div>
+    <div class="logo">ANON<span>·</span>BOARDS</div>
   </div>
   <div style="display:flex;align-items:center;gap:1rem;">
     <div class="anon-badge">
@@ -2448,18 +1996,7 @@
 <div class="main-grid" id="main-content" role="main">
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar" role="navigation" aria-label="Board topics">
-    <!-- Decorative top banner -->
-    <div class="sidebar-top-banner">
-      <div class="sidebar-brand">
-        <span class="sidebar-brand-dot"></span>
-        ANON·BOARDS
-        <span class="sidebar-brand-dot"></span>
-      </div>
-      <div class="sidebar-tagline">Private · Anonymous · Unrestricted</div>
-    </div>
-
     <div class="sidebar-section">
-      <div class="sidebar-rule"><span class="sidebar-rule-dot"></span></div>
       <div class="sidebar-label">// Topics</div>
       <div class="topic-item active" onclick="selectTopic('all', '🌐', 'All Boards', 'Everything, everywhere, all at once.')">
         <span class="topic-icon">🌐</span> All Boards <span class="topic-count">38</span>
@@ -2529,81 +2066,79 @@
   </main>
 
   <!-- PROFILE & ADMIN PANEL -->
-  <div id="profile-panel" style="display:none;">
+  <div id="profile-panel" style="display:none;padding:2rem;background:var(--surface);border-left:1px solid var(--border);width:350px;height:100vh;overflow-y:auto;position:fixed;right:0;top:60px;z-index:140;">
     <!-- Profile Section -->
-    <div id="profile-section">
-      <div class="pp-avatar-wrap">
-        <div class="pp-avatar-ring">
-          <div class="pp-avatar" id="profile-avatar-emoji">👤</div>
+    <div id="profile-section" style="margin-bottom:2rem;">
+      <h3 style="font-size:0.9rem;font-weight:700;color:var(--accent2);margin-bottom:1rem;letter-spacing:0.1em;">// PROFILE</h3>
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:1.5rem;border-radius:4px;">
+        <div style="margin-bottom:0.8rem;">
+          <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.25rem;">USERNAME</div>
+          <div style="font-size:0.9rem;font-weight:600;color:var(--text);" id="profile-username">-</div>
         </div>
-        <div class="pp-id-chip" id="profile-anonid-display">ANON_???</div>
+        <div style="margin-bottom:0.8rem;">
+          <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.25rem;">MEMBER SINCE</div>
+          <div style="font-size:0.85rem;color:var(--text);" id="profile-created">-</div>
+        </div>
+        <div style="margin-bottom:0.8rem;">
+          <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.25rem;">SAVED POSTS</div>
+          <div style="font-size:0.85rem;color:var(--text);" id="profile-favorites">0</div>
+        </div>
+        <div id="profile-admin-badge" style="display:none;margin-top:1rem;padding:0.75rem;background:rgba(255,110,156,0.1);border:1px solid rgba(255,110,156,0.3);border-radius:2px;text-align:center;color:var(--accent3);font-weight:600;font-size:0.8rem;">👑 ADMIN</div>
       </div>
-      <div class="pp-name-row">
-        <span class="pp-username" id="profile-username">—</span>
-        <span class="pp-online-dot"></span>
-      </div>
-      <div class="pp-since" id="profile-created">Member since —</div>
-
-      <div id="profile-admin-badge" style="display:none;" class="pp-admin-badge">👑 ADMINISTRATOR</div>
-
-      <div class="pp-stats-grid">
-        <div class="pp-stat-card">
-          <div class="pp-stat-val" id="profile-favorites">0</div>
-          <div class="pp-stat-label">Saved Posts</div>
-        </div>
-        <div class="pp-stat-card">
-          <div class="pp-stat-val" id="pp-posts-count">0</div>
-          <div class="pp-stat-label">Posts</div>
-        </div>
-        <div class="pp-stat-card">
-          <div class="pp-stat-val" id="pp-replies-count">0</div>
-          <div class="pp-stat-label">Replies</div>
-        </div>
-      </div>
-
-      <button onclick="closeProfilePanel()" class="pp-close-btn">Close Panel</button>
+      <button onclick="closeProfilePanel()" style="width:100%;margin-top:1rem;padding:0.6rem;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;border-radius:2px;font-family:inherit;">Close</button>
     </div>
 
     <!-- Admin Section (Only for Admins) -->
-    <div id="admin-section" style="display:none;" class="pp-admin-section">
-      <div class="pp-section-title">⚙️ Admin Panel</div>
-
+    <div id="admin-section" style="display:none;">
+      <h3 style="font-size:0.9rem;font-weight:700;color:var(--accent3);margin-bottom:1rem;letter-spacing:0.1em;">// ADMIN PANEL</h3>
+      
       <!-- Moderator Requests -->
-      <div class="pp-admin-card">
-        <div class="pp-admin-card-title">📋 Moderator Requests</div>
-        <div class="pp-admin-card-sub" id="admin-mod-requests-count">0 pending</div>
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:1rem;border-radius:4px;margin-bottom:1rem;">
+        <h4 style="font-size:0.8rem;color:var(--accent2);font-weight:700;margin-bottom:0.5rem;">📋 MODERATOR REQUESTS</h4>
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem;" id="admin-mod-requests-count">0 pending</div>
         <div id="admin-mod-requests-list" style="max-height:300px;overflow-y:auto;"></div>
-        <div id="admin-no-mod-requests" style="text-align:center;color:var(--muted);font-size:0.75rem;padding:0.75rem;">No pending requests</div>
+        <div id="admin-no-mod-requests" style="text-align:center;color:var(--muted);font-size:0.75rem;padding:1rem;">No pending requests</div>
       </div>
 
       <!-- User Management -->
-      <div class="pp-admin-card">
-        <div class="pp-admin-card-title">👥 User Management</div>
-        <input type="text" id="admin-profile-manage-username" placeholder="Username..." maxlength="50" class="pp-admin-input">
-        <button onclick="adminGrantAdmin()" class="pp-admin-btn pp-btn-blue">✅ Grant Admin</button>
-        <button onclick="adminRevokeAdmin()" class="pp-admin-btn pp-btn-red">🗑️ Revoke Admin</button>
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:1rem;border-radius:4px;margin-bottom:1rem;">
+        <h4 style="font-size:0.8rem;color:var(--accent2);font-weight:700;margin-bottom:0.5rem;">👥 USER MANAGEMENT</h4>
+        <input type="text" id="admin-profile-manage-username" placeholder="Username..." maxlength="50" style="width:100%;padding:0.5rem;margin-bottom:0.5rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:inherit;border-radius:2px;">
+        <button onclick="adminGrantAdmin()" style="width:100%;padding:0.5rem;background:var(--accent3);color:var(--bg);border:none;cursor:pointer;font-weight:600;border-radius:2px;margin-bottom:0.35rem;font-family:inherit;">✅ Grant Admin</button>
+        <button onclick="adminRevokeAdmin()" style="width:100%;padding:0.5rem;background:var(--danger);color:var(--bg);border:none;cursor:pointer;font-weight:600;border-radius:2px;font-family:inherit;">🗑️ Revoke Admin</button>
       </div>
 
       <!-- Change Anonymous ID -->
-      <div class="pp-admin-card">
-        <div class="pp-admin-card-title">🏷️ Change Anon ID</div>
-        <input type="text" id="admin-change-anonid-username" placeholder="Username..." maxlength="50" class="pp-admin-input">
-        <input type="text" id="admin-change-anonid-new" placeholder="New ID (leave empty to auto-generate)" maxlength="50" class="pp-admin-input">
-        <button onclick="adminChangeAnonID()" class="pp-admin-btn pp-btn-gold">🔄 Change ID</button>
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:1rem;border-radius:4px;margin-bottom:1rem;">
+        <h4 style="font-size:0.8rem;color:var(--accent2);font-weight:700;margin-bottom:0.5rem;">🏷️ CHANGE ANON ID</h4>
+        <input type="text" id="admin-change-anonid-username" placeholder="Username..." maxlength="50" style="width:100%;padding:0.5rem;margin-bottom:0.5rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:inherit;border-radius:2px;">
+        <input type="text" id="admin-change-anonid-new" placeholder="New ANON_*_**** format (optional - leave empty to auto-generate)" maxlength="50" style="width:100%;padding:0.5rem;margin-bottom:0.5rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:inherit;border-radius:2px;">
+        <button onclick="adminChangeAnonID()" style="width:100%;padding:0.5rem;background:rgba(107,184,255,0.3);color:var(--text);border:1px solid var(--accent);cursor:pointer;font-weight:600;border-radius:2px;font-family:inherit;">🔄 Change ID</button>
       </div>
 
       <!-- Stats -->
-      <div class="pp-admin-card">
-        <div class="pp-admin-card-title">📊 System Stats</div>
-        <div class="pp-sys-stats">
-          <div class="pp-sys-row"><span>Users</span><span id="admin-profile-total-users">0</span></div>
-          <div class="pp-sys-row"><span>Admins</span><span id="admin-profile-admin-count">0</span></div>
-          <div class="pp-sys-row"><span>Forums</span><span id="admin-profile-total-forums">0</span></div>
-          <div class="pp-sys-row"><span>Posts</span><span id="admin-profile-total-posts">0</span></div>
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:1rem;border-radius:4px;">
+        <h4 style="font-size:0.8rem;color:var(--accent2);font-weight:700;margin-bottom:0.75rem;">📊 SYSTEM STATS</h4>
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.8rem;">
+          <span style="color:var(--muted);">Users</span>
+          <span style="color:var(--accent);font-weight:600;" id="admin-profile-total-users">0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.8rem;">
+          <span style="color:var(--muted);">Admins</span>
+          <span style="color:var(--accent);font-weight:600;" id="admin-profile-admin-count">0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.8rem;">
+          <span style="color:var(--muted);">Forums</span>
+          <span style="color:var(--accent);font-weight:600;" id="admin-profile-total-forums">0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+          <span style="color:var(--muted);">Posts</span>
+          <span style="color:var(--accent);font-weight:600;" id="admin-profile-total-posts">0</span>
         </div>
       </div>
     </div>
   </div>
+</div>
 
 <!-- THREAD MODAL -->
 <div class="overlay" id="thread-overlay" onclick="closeOnOverlay(event, 'thread-overlay')">
@@ -3491,38 +3026,31 @@ function openUserProfile() {
     showToast('❌ Not logged in');
     return;
   }
+  
+  // Show profile panel
   const profilePanel = document.getElementById('profile-panel');
   profilePanel.style.display = 'block';
-
-  // Avatar emoji
-  const avatarEl = document.getElementById('profile-avatar-emoji');
-  if (avatarEl) avatarEl.textContent = authenticatedUser.emoji || '👤';
-
-  // Anon ID chip
-  const anonChip = document.getElementById('profile-anonid-display');
-  if (anonChip) anonChip.textContent = authenticatedUser.anonID || SESSION_NAME;
-
-  // Username and date
+  
+  // Update profile info
   document.getElementById('profile-username').textContent = authenticatedUser.username;
-  document.getElementById('profile-created').textContent =
-    'Member since ' + new Date(authenticatedUser.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  document.getElementById('profile-created').textContent = new Date(authenticatedUser.createdAt).toLocaleDateString();
   document.getElementById('profile-favorites').textContent = authenticatedUser.favorites.length;
-
-  // Post / reply counts
-  const userPosts = posts.filter(p => p.author === authenticatedUser.anonID || p.author === SESSION_NAME).length;
-  const userReplies = posts.reduce((sum, p) => sum + p.replies.filter(r => r.author === authenticatedUser.anonID || r.author === SESSION_NAME).length, 0);
-  const ppPosts = document.getElementById('pp-posts-count');
-  const ppReplies = document.getElementById('pp-replies-count');
-  if (ppPosts) ppPosts.textContent = userPosts;
-  if (ppReplies) ppReplies.textContent = userReplies;
-
-  // Admin badge + section
+  
+  // Show admin badge if admin
   const adminBadge = document.getElementById('profile-admin-badge');
-  if (adminBadge) adminBadge.style.display = authenticatedUser.isAdmin ? 'block' : 'none';
+  if (authenticatedUser.isAdmin) {
+    adminBadge.style.display = 'block';
+  } else {
+    adminBadge.style.display = 'none';
+  }
+  
+  // Show admin section if admin
   const adminSection = document.getElementById('admin-section');
-  if (adminSection) {
-    adminSection.style.display = authenticatedUser.isAdmin ? 'block' : 'none';
-    if (authenticatedUser.isAdmin) updateAdminProfileList();
+  if (authenticatedUser.isAdmin) {
+    adminSection.style.display = 'block';
+    updateAdminProfileList();
+  } else {
+    adminSection.style.display = 'none';
   }
 }
 
@@ -4535,34 +4063,6 @@ let currentBoard = 'all';
 let currentSort = 'hot';
 let currentPostId = null;
 let currentParentReplyIndex = null; // Track which reply we're responding to
-let savedPostIds = new Set();
-
-function loadSavedPostIds() {
-  try {
-    const saved = localStorage.getItem('savedPostIds');
-    savedPostIds = new Set(saved ? JSON.parse(saved) : []);
-  } catch (error) {
-    console.warn('Failed to load saved posts from localStorage:', error);
-    savedPostIds = new Set();
-  }
-}
-
-function persistSavedPostIds() {
-  localStorage.setItem('savedPostIds', JSON.stringify([...savedPostIds]));
-}
-
-function togglePostSave(postId) {
-  postId = Number(postId);
-  if (savedPostIds.has(postId)) {
-    savedPostIds.delete(postId);
-    showToast('🔖 Removed from saved posts');
-  } else {
-    savedPostIds.add(postId);
-    showToast('🔖 Saved post');
-  }
-  persistSavedPostIds();
-  renderPosts();
-}
 
 // ── MODERATOR & FORUM MANAGEMENT ────────────────────────────────────────
 let forums = Object.keys(BOARDS).map(key => ({
@@ -4703,12 +4203,8 @@ function deletePost(postId, forumId) {
   const forum = forums.find(f => f.id === forumId);
   if (!forum) return false;
 
-  const post = posts.find(p => p.id === postId);
-  if (!post) return false;
-
   const isModerator = forum.moderators.includes(SESSION_NAME);
-  const canDelete = isModerator || post.author === SESSION_NAME;
-  if (!canDelete) return false;
+  if (!isModerator) return false;
 
   posts = posts.filter(p => p.id !== postId);
   // Delete from Supabase — Realtime will propagate the DELETE to all clients
@@ -4895,7 +4391,6 @@ function renderPosts() {
     if (p.pinned) tags.push('<span class="post-tag tag-pin">📌 Pinned</span>');
     if (p.hot) tags.push('<span class="post-tag tag-hot">🔥 Hot</span>');
     if (Date.now()-p.time < 3600000) tags.push('<span class="post-tag tag-new">✦ New</span>');
-    const isSaved = savedPostIds.has(Number(p.id));
 
     return `
     <div class="post-card ${p.pinned?'pinned':''}" onclick="openThread(${p.id})" role="article" tabindex="0" aria-label="${sanitize(truncate(p.title,80))}">
@@ -4920,7 +4415,6 @@ function renderPosts() {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           <span aria-label="${p.views} views">${p.views}</span>
         </span>
-        <button class="bookmark-btn${isSaved ? ' active' : ''}" onclick="event.stopPropagation(); togglePostSave(${p.id});" aria-pressed="${isSaved}">${isSaved ? '🔖 Saved' : '🔖 Save'}</button>
       </div>
     </div>`;
   }).join('');
@@ -4989,16 +4483,15 @@ function openThread(id) {
 
   const forum = forums.find(f => f.id === post.board);
   const isModerator = forum && forum.moderators.includes(SESSION_NAME);
-  const canDeletePost = isModerator || post.author === SESSION_NAME;
 
   document.getElementById('thread-title').textContent = truncate(post.title, 200);
   document.getElementById('op-name').textContent = post.author;
   document.getElementById('op-time').textContent = timeAgo(post.time);
   document.getElementById('op-text').textContent = post.body;
 
-  // Add/remove delete button for post author or moderators
+  // Add/remove delete button for moderators
   let delBtn = document.getElementById('op-delete-btn');
-  if (canDeletePost) {
+  if (isModerator) {
     if (!delBtn) {
       const header = document.querySelector('.op-post');
       if (header) {
@@ -5008,7 +4501,6 @@ function openThread(id) {
         btnContainer.innerHTML = `
           <button class="reply-action-btn danger" id="op-delete-btn" onclick="deleteReplyMod(${post.id}, -1)" title="Delete this post">🗑️ Delete Post</button>
         `;
-        header.appendChild(btnContainer);
       }
     }
   } else {
@@ -6318,7 +5810,6 @@ function showToast(msg) {
       }
     }
     updateLoginUI();
-    loadSavedPostIds();
     
     // Show data status
     console.log('📊 Loaded data:', {
