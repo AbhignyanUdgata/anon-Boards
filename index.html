@@ -2123,7 +2123,6 @@
 .pp-sys-row span:first-child { color: var(--muted); }
 .pp-sys-row span:last-child  { font-weight: 700; color: var(--accent); }
 
-<style>
 /* ── AUTH MODAL REDESIGN ─────────────────────────────────────────────── */
 .auth-overlay {
   display: none;
@@ -5511,6 +5510,12 @@ function showToast(msg) {
     }
     updateLoginUI();
     loadSavedPostIds();
+    
+    // Login menu button click handler - prevent menu from closing immediately
+    document.getElementById('login-menu-btn')?.addEventListener('click', function(event) {
+      event.stopPropagation(); // Prevent the outside-click listener from immediately closing it
+      toggleUserMenu();
+    });
     
     // Show data status
     console.log('📊 Loaded data:', {
