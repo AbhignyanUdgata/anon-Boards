@@ -34,6 +34,9 @@
 <meta http-equiv="Referrer-Policy" content="no-referrer">
 <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
 
+<!-- Authentication & User Management - Load FIRST before any other scripts -->
+<script src="auth.js"></script>
+
 <!-- Open Graph / Social Sharing -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="ANON·BOARDS — Speak Freely">
@@ -73,11 +76,6 @@
 
 <!-- Supabase JS client -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-
-<!-- Authentication & User Management -->
-<!-- Must load before the main inline script so auth globals are available
-     to the initialisation IIFE at the bottom of the page. -->
-<script src="auth.js"></script>
 
 <!-- Canonical -->
 <link rel="canonical" href="https://anon-boards.netlify.app">
