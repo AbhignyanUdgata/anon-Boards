@@ -34,9 +34,6 @@
 <meta http-equiv="Referrer-Policy" content="no-referrer">
 <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
 
-<!-- Authentication & User Management - Load FIRST before any other scripts -->
-<script src="auth.js"></script>
-
 <!-- Open Graph / Social Sharing -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="ANON·BOARDS — Speak Freely">
@@ -2121,6 +2118,7 @@
 .pp-sys-row span:first-child { color: var(--muted); }
 .pp-sys-row span:last-child  { font-weight: 700; color: var(--accent); }
 
+<style>
 /* ── AUTH MODAL REDESIGN ─────────────────────────────────────────────── */
 .auth-overlay {
   display: none;
@@ -3453,11 +3451,138 @@ function resetSettings() {
   showToast('✓ Settings reset to defaults');
 }
 
+// User menu
+function toggleUserMenu() {
+  document.getElementById('user-menu-dropdown').classList.toggle('open');
+}
 
-// toggleUserMenu, toggleSettingsMenu, registerNewAccount,
-// openChangePassword, openUserProfile, closeProfilePanel,
-// openFavoritesView, clearSession → auth.js
+function toggleSettingsMenu() {
+  document.getElementById('settings-dropdown').classList.toggle('open');
+}
 
+// Close dropdowns when clicking elsewhere
+document.addEventListener('click', function(event) {
+  const userDropdown = document.getElementById('user-menu-dropdown');
+  const userTrigger = document.getElementById('login-menu-btn');
+  const settingsDropdown = document.getElementById('settings-dropdown');
+  const settingsTrigger = document.getElementById('user-menu-btn');
+  
+  if (userDropdown && !userDropdown.contains(event.target) && !userTrigger.contains(event.target)) {
+    userDropdown.classList.remove('open');
+  }
+  if (settingsDropdown && !settingsDropdown.contains(event.target) && !settingsTrigger.contains(event.target)) {
+    settingsDropdown.classList.remove('open');
+  }
+});
+
+// Register new account
+async function registerNewAccount() {
+  const username = document.getElementById('register-username').value;
+  const password = document.getElementById('register-password').value;
+  const confirm = document.getElementById('register-confirm').value;
+  
+  if (password !== confirm) {
+    showToast('❌ Passwords do not match');
+    return;
+  }
+  
+  if (await createUserAccount(username, password)) {
+    document.getElementById('register-username').value = '';
+    document.getElementById('register-password').value = '';
+    document.getElementById('register-confirm').value = '';
+    closeModal('register-modal');
+    
+    // Auto-login (don't close any modal from loginUser)
+    await autoLoginUser(username, password);
+  }
+}
+
+// Open change password dialog
+function openChangePassword() {
+  closeModal('settings-dropdown');
+  openModal('change-password-modal');
+}
+// Alias used in dropdown
+function openChangePasswordModal() { openChangePassword(); }
+
+// Open user profile view
+function openUserProfile() {
+  if (!authenticatedUser) {
+    showToast('❌ Not logged in');
+    return;
+  }
+  const profilePanel = document.getElementById('profile-panel');
+  profilePanel.style.display = 'block';
+
+  // Avatar emoji
+  const avatarEl = document.getElementById('profile-avatar-emoji');
+  if (avatarEl) avatarEl.textContent = authenticatedUser.emoji || '👤';
+
+  // Anon ID chip
+  const anonChip = document.getElementById('profile-anonid-display');
+  if (anonChip) anonChip.textContent = authenticatedUser.anonID || SESSION_NAME;
+
+  // Username and date
+  document.getElementById('profile-username').textContent = authenticatedUser.username;
+  document.getElementById('profile-created').textContent =
+    'Member since ' + new Date(authenticatedUser.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  document.getElementById('profile-favorites').textContent = authenticatedUser.favorites.length;
+
+  // Post / reply counts
+  const userPosts = posts.filter(p => p.author === authenticatedUser.anonID || p.author === SESSION_NAME).length;
+  const userReplies = posts.reduce((sum, p) => sum + p.replies.filter(r => r.author === authenticatedUser.anonID || r.author === SESSION_NAME).length, 0);
+  const ppPosts = document.getElementById('pp-posts-count');
+  const ppReplies = document.getElementById('pp-replies-count');
+  if (ppPosts) ppPosts.textContent = userPosts;
+  if (ppReplies) ppReplies.textContent = userReplies;
+
+  // Admin badge + section
+  const adminBadge = document.getElementById('profile-admin-badge');
+  if (adminBadge) adminBadge.style.display = authenticatedUser.isAdmin ? 'block' : 'none';
+  const adminSection = document.getElementById('admin-section');
+  if (adminSection) {
+    adminSection.style.display = authenticatedUser.isAdmin ? 'block' : 'none';
+    if (authenticatedUser.isAdmin) updateAdminProfileList();
+  }
+}
+
+function closeProfilePanel() {
+  document.getElementById('profile-panel').style.display = 'none';
+}
+
+// View saved posts
+function openFavoritesView() {
+  if (!authenticatedUser) {
+    showToast('❌ Not logged in');
+    return;
+  }
+  const favorites = getUserFavorites();
+  if (favorites.length === 0) {
+    showToast('❌ No saved posts yet');
+    return;
+  }
+  console.log(`♥️ Your ${favorites.length} saved posts:`, favorites);
+  showToast(`♥️ You have ${favorites.length} saved posts`);
+}
+
+// Open modal helper
+function openModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.add('open');
+    // Force reflow and ensure positioning
+    modal.style.display = 'flex';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.right = '0';
+    modal.style.bottom = '0';
+  }
+}
+
+// Start new session
+function clearSession() {
+  location.reload();
+}
 
 // Track stats
 function trackPostCreated() {
@@ -3629,20 +3754,489 @@ const BOARDS = {
 };
 
 // ── USER AUTHENTICATION SYSTEM ────────────────────────────────────────────
-// All auth, user management, admin panel, and moderator request logic
-// lives in auth.js (loaded below). Globals it exposes:
-//   authenticatedUser, allUsers, dbInitialized, moderatorRequests, DEFAULT_ADMIN
-//   hashPassword, createUserAccount, loginUser, autoLoginUser, logoutUser,
-//   saveUsersToDatabase, loadUsersFromDatabase, initUsersSyncChannel,
-//   updateLoginUI, submitLogin, registerNewAccount, submitChangePassword,
-//   openUserProfile, closeProfilePanel, openFavoritesView,
-//   openChangeUsernameModal, submitChangeUsername, changePassword,
-//   addToFavorites, removeFromFavorites, getUserFavorites,
-//   grantAdminPrivileges, revokeAdminPrivileges, isUserAdmin,
-//   toggleAdminPanel, updateAdminProfileList, adminGrantAdmin, adminRevokeAdmin,
-//   adminChangeAnonID, approveModRequest, rejectModRequest,
-//   submitModeratorRequest, openRequestModModal,
-//   toggleUserMenu, toggleSettingsMenu, clearSession
+let authenticatedUser = null;  // Current logged-in user account
+let allUsers = [];  // All user accounts
+let dbInitialized = false;  // Flag to track if database is ready
+let moderatorRequests = [];  // Track pending moderator requests
+const DEFAULT_ADMIN = 'Abhignyan1103';  // Default admin username
+
+// User account structure:
+// { id: unique, username: str, passwordHash: str, avatar: str, createdAt: timestamp, favorites: [], lastLogin: timestamp, isAnonymous: bool, isAdmin: bool, isSuperAdmin: bool, anonID: str }
+
+// Simple password hashing (NOT for production - use bcrypt in real app)
+function hashPassword(password) {
+  let hash = 0;
+  for (let i = 0; i < password.length; i++) {
+    const char = password.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(16);
+}
+
+// Create new user account
+async function createUserAccount(username, password) {
+  // Validation
+  if (!username || username.length < 3) {
+    showToast('❌ Username must be at least 3 characters');
+    return false;
+  }
+  
+  if (!password || password.length < 6) {
+    showToast('❌ Password must be at least 6 characters');
+    return false;
+  }
+  
+  // Check if username already exists
+  if (allUsers.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+    showToast('❌ Username already taken');
+    return false;
+  }
+  
+  // Generate fixed emoji avatar (only once at account creation)
+  const emoji = getRandomEmoji();
+  
+  // Generate fixed anonymous identity (only once at account creation)
+  const fixedAnonID = genAnonName();
+  
+  // Create user object
+  const newUser = {
+    id: 'user_' + Date.now(),
+    username: username.trim(),
+    passwordHash: hashPassword(password),
+    emoji: emoji,  // Fixed emoji avatar for this account
+    anonID: fixedAnonID,  // Fixed anonymous identity for this account (like ANON_IronWolf_6754)
+    createdAt: Date.now(),
+    favorites: [],
+    lastLogin: Date.now(),
+    isAnonymous: false,
+    isAdmin: false,  // Admin status
+    isSuperAdmin: false  // Super admin status
+  };
+  
+  // Save to array and database
+  allUsers.push(newUser);
+  await saveUsersToDatabase(allUsers);
+  
+  console.log('✓ Account created:', newUser.username);
+  return true;
+}
+
+// Login user (from login form)
+async function loginUser(username, password) {
+  // Always fetch fresh from Supabase so stale in-memory data never blocks login
+  // (covers cross-tab registration where this tab hasn't received the Realtime event yet)
+  try {
+    const fresh = await loadUsersFromDatabase();
+    if (fresh.length > 0) allUsers = fresh;
+  } catch (e) {
+    console.warn('⚠️ Fresh user fetch failed, falling back to in-memory:', e);
+  }
+
+  const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+  
+  if (!user) {
+    showToast('❌ Username not found');
+    return false;
+  }
+  
+  const passwordHash = hashPassword(password);
+  
+  if (user.passwordHash !== passwordHash) {
+    showToast('❌ Incorrect password');
+    return false;
+  }
+  
+  // ✨ FIX FOR OLD ACCOUNTS: If account doesn't have anonID (created before update), generate one now
+  if (!user.anonID) {
+    user.anonID = genAnonName();
+    console.log('✓ Generated missing anonID for old account:', user.anonID);
+  }
+  
+  // Update last login
+  user.lastLogin = Date.now();
+  authenticatedUser = user;
+  
+  // ✨ SET SESSION NAME TO FIXED ANON ID (e.g., ANON_IronWolf_6754)
+  SESSION_NAME = user.anonID;
+  document.getElementById('session-id').textContent = SESSION_NAME;
+  document.getElementById('reply-anon-name').textContent = SESSION_NAME;
+  document.getElementById('new-anon-name').textContent = SESSION_NAME;
+  
+  await saveUsersToDatabase(allUsers);
+  
+  // Remember this login
+  localStorage.setItem('lastLoggedInUsername', user.username);
+  
+  // Update UI
+  updateLoginUI();
+  closeModal('login-modal');
+  
+  console.log('✓ Logged in as:', user.username);
+  showToast('✓ Welcome back, ' + user.username);
+  return true;
+}
+
+// Auto-login user (after registration, doesn't close login modal)
+async function autoLoginUser(username, password) {
+  const user = allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+  
+  if (!user) {
+    console.error('User not found for auto-login');
+    return false;
+  }
+  
+  const passwordHash = hashPassword(password);
+  if (user.passwordHash !== passwordHash) {
+    console.error('Password mismatch for auto-login');
+    return false;
+  }
+  
+  // ✨ FIX FOR OLD ACCOUNTS: If account doesn't have anonID (created before update), generate one now
+  if (!user.anonID) {
+    user.anonID = genAnonName();  // Generate fixed anonID if missing
+    console.log('✓ Generated missing anonID for old account:', user.anonID);
+  }
+  
+  // Update last login
+  user.lastLogin = Date.now();
+  authenticatedUser = user;
+  
+  // ✨ SET SESSION NAME TO FIXED ANON ID (e.g., ANON_IronWolf_6754)
+  SESSION_NAME = user.anonID;
+  document.getElementById('session-id').textContent = SESSION_NAME;
+  document.getElementById('reply-anon-name').textContent = SESSION_NAME;
+  document.getElementById('new-anon-name').textContent = SESSION_NAME;
+  
+  // Remember this login
+  localStorage.setItem('lastLoggedInUsername', user.username);
+  
+  // Update UI
+  updateLoginUI();
+  
+  console.log('✓ Auto-logged in as:', user.username);
+  showToast('✓ Logged in as ' + user.username);
+  return true;
+}
+
+// Logout user
+function logoutUser() {
+  authenticatedUser = null;
+  
+  // 🔄 RESET SESSION NAME TO ANONYMOUS (generate new identity)
+  SESSION_NAME = genAnonName();
+  document.getElementById('session-id').textContent = SESSION_NAME;
+  document.getElementById('reply-anon-name').textContent = SESSION_NAME;
+  document.getElementById('new-anon-name').textContent = SESSION_NAME;
+  
+  localStorage.removeItem('lastLoggedInUsername');
+  updateLoginUI();
+  
+  showToast('✓ Logged out — new anonymous session started');
+  renderPosts();
+}
+
+// Change username (for logged-in users) - updates display only, not identity
+function openChangeUsernameModal() {
+  if (!authenticatedUser) {
+    showToast('❌ Must be logged in');
+    return;
+  }
+  openModal('change-username-modal');
+}
+
+function submitChangeUsername() {
+  if (!authenticatedUser) {
+    showToast('❌ Not logged in');
+    return;
+  }
+  
+  const newUsername = document.getElementById('change-username-input').value.trim();
+  
+  if (!newUsername || newUsername.length < 3) {
+    showToast('❌ Username must be at least 3 characters');
+    return;
+  }
+  
+  // Check if new username is same as current
+  if (newUsername.toLowerCase() === authenticatedUser.username.toLowerCase()) {
+    showToast('❌ That is already your username');
+    return;
+  }
+  
+  // Check if username already exists
+  if (allUsers.some(u => u.username.toLowerCase() === newUsername.toLowerCase())) {
+    showToast('❌ Username already taken');
+    return;
+  }
+  
+  // Update username (but identity/anonID stays the same)
+  const oldUsername = authenticatedUser.username;
+  authenticatedUser.username = newUsername.trim();
+  
+  // Update user in array
+  const userIdx = allUsers.findIndex(u => u.id === authenticatedUser.id);
+  if (userIdx >= 0) {
+    allUsers[userIdx].username = newUsername.trim();
+  }
+  
+  // Save changes
+  saveUsersToDatabase(allUsers);
+  updateLoginUI();
+  
+  document.getElementById('change-username-input').value = '';
+  closeModal('change-username-modal');
+  
+  showToast(`✓ Username changed to "${newUsername}"`);
+}
+async function changePassword(oldPassword, newPassword, confirmPassword) {
+  if (!authenticatedUser) {
+    showToast('❌ Not logged in');
+    return false;
+  }
+  
+  if (hashPassword(oldPassword) !== authenticatedUser.passwordHash) {
+    showToast('❌ Old password is incorrect');
+    return false;
+  }
+  
+  if (newPassword !== confirmPassword) {
+    showToast('❌ Passwords do not match');
+    return false;
+  }
+  
+  if (newPassword.length < 6) {
+    showToast('❌ Password must be at least 6 characters');
+    return false;
+  }
+  
+  authenticatedUser.passwordHash = hashPassword(newPassword);
+  await saveUsersToDatabase(allUsers);
+  showToast('✓ Password changed successfully');
+  return true;
+}
+
+// Add post to favorites
+async function addToFavorites(postId) {
+  if (!authenticatedUser) {
+    showToast('⚠️ Login to save favorites');
+    return false;
+  }
+  
+  if (!authenticatedUser.favorites.includes(postId)) {
+    authenticatedUser.favorites.push(postId);
+    await saveUsersToDatabase(allUsers);
+    console.log('♥️ Added to favorites:', postId);
+  }
+  return true;
+}
+
+// Remove from favorites
+async function removeFromFavorites(postId) {
+  if (!authenticatedUser) return false;
+  
+  authenticatedUser.favorites = authenticatedUser.favorites.filter(id => id !== postId);
+  await saveUsersToDatabase(allUsers);
+  console.log('Removed from favorites:', postId);
+  return true;
+}
+
+// Get user's favorite posts
+function getUserFavorites() {
+  if (!authenticatedUser) return [];
+  return posts.filter(p => authenticatedUser.favorites.includes(p.id));
+}
+
+// Get user by username
+function getUserByUsername(username) {
+  return allUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+}
+
+// Grant admin privileges to a user
+async function grantAdminPrivileges(username) {
+  const user = getUserByUsername(username);
+  
+  if (!user) {
+    console.error(`❌ User "${username}" not found`);
+    return false;
+  }
+  
+  user.isAdmin = true;
+  await saveUsersToDatabase(allUsers);
+  console.log(`✅ Admin privileges granted to ${user.username}`);
+  showToast(`✅ ${user.username} is now an ADMIN`);
+  return true;
+}
+
+// Revoke admin privileges from a user
+async function revokeAdminPrivileges(username) {
+  const user = getUserByUsername(username);
+  
+  if (!user) {
+    console.error(`❌ User "${username}" not found`);
+    return false;
+  }
+  
+  user.isAdmin = false;
+  await saveUsersToDatabase(allUsers);
+  console.log(`✅ Admin privileges revoked from ${user.username}`);
+  showToast(`✅ Admin privileges removed from ${user.username}`);
+  return true;
+}
+
+// Check if user is admin
+function isUserAdmin(username) {
+  const user = getUserByUsername(username);
+  return user ? user.isAdmin : false;
+}
+
+// ── MODERATOR REQUEST SYSTEM ──────────────────────────────────────────────
+function requestModeratorStatus(username, boardId, reason) {
+  if (!username) {
+    showToast('❌ Login required to request moderator status');
+    return false;
+  }
+  
+  const request = {
+    id: Date.now(),
+    username: username,
+    boardId: boardId,
+    reason: reason,
+    createdAt: Date.now(),
+    status: 'pending', // pending, approved, rejected
+    reviewedBy: null,
+    reviewedAt: null
+  };
+  
+  moderatorRequests.push(request);
+  console.log('✓ Moderator request submitted:', request);
+  return true;
+}
+
+function approveModerator(requestId, adminUsername) {
+  const request = moderatorRequests.find(r => r.id === requestId);
+  if (!request) return false;
+  
+  const user = getUserByUsername(request.username);
+  if (!user) return false;
+  
+  // Make user a moderator of the board
+  const forum = forums.find(f => f.id === request.boardId);
+  if (forum && !forum.moderators.includes(request.username)) {
+    forum.moderators.push(request.username);
+    saveForumsToDatabase();
+  }
+  
+  // Mark request as approved
+  request.status = 'approved';
+  request.reviewedBy = adminUsername;
+  request.reviewedAt = Date.now();
+  
+  console.log(`✓ Moderator request approved for ${request.username}`);
+  return true;
+}
+
+function rejectModerator(requestId, adminUsername, reason) {
+  const request = moderatorRequests.find(r => r.id === requestId);
+  if (!request) return false;
+  
+  request.status = 'rejected';
+  request.reviewedBy = adminUsername;
+  request.reviewedAt = Date.now();
+  request.rejectionReason = reason;
+  
+  console.log(`✓ Moderator request rejected for ${request.username}`);
+  return true;
+}
+
+// Update login UI display
+function updateLoginUI() {
+  const loginBtn = document.getElementById('login-menu-btn');
+  const userDropdown = document.getElementById('user-menu-dropdown');
+  
+  if (authenticatedUser) {
+    // Assign random emoji avatar if not already assigned
+    if (!authenticatedUser.emoji) {
+      authenticatedUser.emoji = getRandomEmoji();
+      saveUsersToDatabase(allUsers);
+    }
+    
+    // Show logged-in UI with attractive design
+    loginBtn.innerHTML = `
+      <div class="user-avatar">${authenticatedUser.emoji}</div>
+      <div class="user-username">
+        <div class="username-text">${authenticatedUser.username}</div>
+        <div class="username-status">ONLINE</div>
+      </div>
+    `;
+    
+    // Update dropdown menu
+    if (userDropdown) {
+      const isAdmin = allUsers.some(u => u.username === SESSION_NAME && u.isAdmin);
+      let adminOption = '';
+      if (isAdmin) {
+        adminOption = `<div class="dropdown-item" style="color:var(--accent3);" onclick="toggleAdminPanel()">👑 Admin Panel</div>`;
+      }
+      
+      userDropdown.innerHTML = `
+        <div class="dropdown-item" onclick="openUserProfile()">👤 My Profile</div>
+        <div class="dropdown-item" onclick="openChangePasswordModal()">🔐 Change Password</div>
+        <div class="dropdown-item" onclick="openChangeUsernameModal()" style="color:var(--accent3);">�️ Change Account Name</div>
+        <div class="dropdown-item" onclick="openFavoritesView()">♥️ Saved Posts</div>
+        <div class="dropdown-item" style="color:var(--danger);" onclick="logoutUser()">🚪 Logout</div>
+      `;
+    }
+  } else {
+    // Show login UI
+    loginBtn.innerHTML = '<div class="user-avatar">🔓</div><div class="user-username"><div class="username-text">Login</div><div class="username-status">GUEST</div></div>';
+    
+    if (userDropdown) {
+      userDropdown.innerHTML = `
+        <div class="dropdown-item" onclick="openModal('login-modal')">🔑 Login</div>
+        <div class="dropdown-item" onclick="openModal('register-modal')">✍️ Create Account</div>
+      `;
+    }
+  }
+}
+
+// Submit login form
+async function submitLogin() {
+  const username = document.getElementById('login-username').value;
+  const password = document.getElementById('login-password').value;
+  
+  if (!username || !password) {
+    showToast('❌ Please enter username and password');
+    return;
+  }
+  
+  if (await loginUser(username, password)) {
+    document.getElementById('login-username').value = '';
+    document.getElementById('login-password').value = '';
+    closeModal('login-modal');
+  } else {
+    showToast('❌ Invalid username or password');
+  }
+}
+
+// Submit change password form
+async function submitChangePassword() {
+  const oldPass = document.getElementById('old-password').value;
+  const newPass = document.getElementById('new-password').value;
+  const confirm = document.getElementById('confirm-new-password').value;
+  
+  if (!oldPass || !newPass || !confirm) {
+    showToast('❌ Please fill all password fields');
+    return;
+  }
+  
+  if (await changePassword(oldPass, newPass, confirm)) {
+    document.getElementById('old-password').value = '';
+    document.getElementById('new-password').value = '';
+    document.getElementById('confirm-new-password').value = '';
+    closeModal('change-password-modal');
+    showToast('✓ Password changed successfully');
+  }
+}
 
 // ── SUPABASE STORAGE SYSTEM ───────────────────────────────────────────────
 let db = null;          // kept for legacy references (unused)
@@ -3755,7 +4349,49 @@ async function setMetadata(key, value) {
   return !error;
 }
 
-// saveUsersToDatabase() and loadUsersFromDatabase() → auth.js
+// Save users array to Supabase
+async function saveUsersToDatabase(users) {
+  const rows = users.map(u => ({
+    id:             u.id,
+    username:       u.username,
+    password_hash:  u.passwordHash  || '',
+    emoji:          u.emoji         || '',
+    anon_id:        u.anonID        || '',
+    created_at:     u.createdAt     || 0,
+    last_login:     u.lastLogin     || 0,
+    is_admin:       u.isAdmin       ? true : false,
+    is_super_admin: u.isSuperAdmin  ? true : false,
+    favorites:      u.favorites     || []
+  }));
+  const { error } = await sbClient.from('users').upsert(rows, { onConflict: 'id' });
+  if (error) {
+    console.error('saveUsersToDatabase error:', error.message);
+    return false;
+  }
+  // Keep SQLite in sync so the downloadable .sql always has latest users
+  if (sqlDB) {
+    syncToSQLite().then(() => saveAutosaveLink()).catch(e => console.warn('SQLite user sync:', e));
+  }
+  return true;
+}
+
+// Load users from Supabase
+async function loadUsersFromDatabase() {
+  const { data, error } = await sbClient.from('users').select('*');
+  if (error || !data) return [];
+  return data.map(r => ({
+    id:           r.id,
+    username:     r.username,
+    passwordHash: r.password_hash,
+    emoji:        r.emoji,
+    anonID:       r.anon_id,
+    createdAt:    r.created_at,
+    lastLogin:    r.last_login,
+    isAdmin:      r.is_admin,
+    isSuperAdmin: r.is_super_admin,
+    favorites:    Array.isArray(r.favorites) ? r.favorites : []
+  }));
+}
 
 // ── SUPABASE REALTIME SUBSCRIPTIONS ──────────────────────────────────────
 function initializeSyncChannel() {
@@ -3811,8 +4447,38 @@ function initializeSyncChannel() {
     })
     .subscribe(status => console.log('Forums channel:', status));
 
-  // Users realtime channel is set up in auth.js
-  initUsersSyncChannel();
+  // Users channel — keep allUsers in sync across tabs so cross-tab login works
+  sbClient.channel('realtime:users')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, payload => {
+      const { eventType, new: row, old } = payload;
+      if (eventType === 'DELETE') {
+        allUsers = allUsers.filter(u => u.id !== old.id);
+      } else if (row) {
+        const incoming = {
+          id:           row.id,
+          username:     row.username,
+          passwordHash: row.password_hash,
+          emoji:        row.emoji,
+          anonID:       row.anon_id,
+          createdAt:    row.created_at,
+          lastLogin:    row.last_login,
+          isAdmin:      row.is_admin,
+          isSuperAdmin: row.is_super_admin,
+          favorites:    Array.isArray(row.favorites) ? row.favorites : []
+        };
+        const idx = allUsers.findIndex(u => u.id === incoming.id);
+        if (idx >= 0) {
+          // Don't overwrite the currently authenticated user's in-memory session
+          if (!authenticatedUser || authenticatedUser.id !== incoming.id) {
+            allUsers[idx] = incoming;
+          }
+        } else {
+          allUsers.push(incoming);
+          console.log('👤 New user registered (Realtime):', incoming.username);
+        }
+      }
+    })
+    .subscribe(status => console.log('Users channel:', status));
 
   console.log('✓ Supabase Realtime subscriptions active (posts + forums + users)');
 }
@@ -5131,9 +5797,223 @@ function transferOwnershipFromDialog() {
   showToast(`✓ Ownership transferred to ${newOwner}`);
 }
 
+// ── ADMIN PANEL FUNCTIONS ────────────────────────────────────────────────
+function toggleAdminPanel() {
+  // Simply open the profile panel which will show admin section if user is admin
+  openUserProfile();
+}
 
-// ── ADMIN PANEL FUNCTIONS, MOD REQUESTS → auth.js ──────────────────────
+function updateAdminProfileList() {
+  const adminSection = document.getElementById('admin-section');
+  if (!adminSection || adminSection.style.display === 'none') return;
+  
+  const isAdmin = allUsers.some(u => u.username === SESSION_NAME && u.isAdmin);
+  if (!isAdmin) return;
+  
+  const requestsCountEl = document.getElementById('admin-mod-requests-count');
+  const requestsListEl = document.getElementById('admin-mod-requests-list');
+  const noRequestsEl = document.getElementById('admin-no-mod-requests');
+  
+  const pendingRequests = moderatorRequests.filter(r => r.status === 'pending');
+  
+  if (requestsCountEl) {
+    requestsCountEl.textContent = `${pendingRequests.length} pending`;
+  }
+  
+  if (pendingRequests.length === 0) {
+    requestsListEl.innerHTML = '';
+    if (noRequestsEl) noRequestsEl.style.display = 'block';
+  } else {
+    if (noRequestsEl) noRequestsEl.style.display = 'none';
+    requestsListEl.innerHTML = pendingRequests.map(req => {
+      const board = BOARDS[req.boardId];
+      return `
+      <div style="background:var(--bg);border:1px solid var(--border);padding:0.6rem;margin-bottom:0.4rem;border-radius:2px;font-size:0.75rem;">
+        <div style="font-weight:600;color:var(--accent);margin-bottom:0.25rem;">${req.username}</div>
+        <div style="color:var(--muted);margin-bottom:0.25rem;">📌 ${board?.name || req.boardId}</div>
+        <div style="color:var(--text);margin-bottom:0.4rem;">"${req.reason.substring(0, 40)}${req.reason.length > 40 ? '...' : ''}"</div>
+        <div style="display:flex;gap:0.25rem;">
+          <button onclick="approveModRequest(${req.id})" style="flex:1;padding:0.3rem;background:var(--accent3);color:var(--bg);border:none;cursor:pointer;border-radius:2px;font-size:0.7rem;font-family:inherit;font-weight:600;">Approve</button>
+          <button onclick="rejectModRequest(${req.id})" style="flex:1;padding:0.3rem;background:var(--danger);color:var(--bg);border:none;cursor:pointer;border-radius:2px;font-size:0.7rem;font-family:inherit;font-weight:600;">Reject</button>
+        </div>
+      </div>
+    `}).join('');
+  }
+  
+  // Update stats
+  const totalUsersEl = document.getElementById('admin-profile-total-users');
+  const adminCountEl = document.getElementById('admin-profile-admin-count');
+  const totalForumsEl = document.getElementById('admin-profile-total-forums');
+  const totalPostsEl = document.getElementById('admin-profile-total-posts');
+  
+  if (totalUsersEl) totalUsersEl.textContent = allUsers.length;
+  if (adminCountEl) adminCountEl.textContent = allUsers.filter(u => u.isAdmin).length;
+  if (totalForumsEl) totalForumsEl.textContent = forums.length;
+  if (totalPostsEl) totalPostsEl.textContent = posts.length;
+}
 
+
+
+function approveModRequest(requestId) {
+  const request = moderatorRequests.find(r => r.id === requestId);
+  if (!request) return;
+  
+  if (approveModerator(requestId, SESSION_NAME)) {
+    showToast(`✓ Approved ${request.username} as moderator`);
+    updateAdminProfileList();
+  }
+}
+
+function rejectModRequest(requestId) {
+  const request = moderatorRequests.find(r => r.id === requestId);
+  if (!request) return;
+  
+  const reason = prompt(`Reject moderator request from ${request.username}?\n\nOptional reason:`, '');
+  if (reason === null) return;
+  
+  if (rejectModerator(requestId, SESSION_NAME, reason)) {
+    showToast(`✕ Rejected ${request.username}'s moderator request`);
+    updateAdminProfileList();
+  }
+}
+
+function adminGrantAdmin() {
+  const username = document.getElementById('admin-profile-manage-username').value.trim();
+  if (!username) {
+    showToast('Enter a username');
+    return;
+  }
+  
+  const user = getUserByUsername(username);
+  if (!user) {
+    showToast('User not found');
+    return;
+  }
+  
+  if (user.isAdmin) {
+    showToast(`${username} is already an admin`);
+    return;
+  }
+  
+  user.isAdmin = true;
+  user.isSuperAdmin = true;
+  saveUsersToDatabase(allUsers);
+  document.getElementById('admin-profile-manage-username').value = '';
+  showToast(`✓ ${username} is now an admin`);
+  updateAdminProfileList();
+}
+
+function adminRevokeAdmin() {
+  const username = document.getElementById('admin-profile-manage-username').value.trim();
+  if (!username) {
+    showToast('Enter a username');
+    return;
+  }
+  
+  if (username === SESSION_NAME) {
+    showToast('❌ You cannot revoke your own admin rights');
+    return;
+  }
+  
+  const user = getUserByUsername(username);
+  if (!user) {
+    showToast('User not found');
+    return;
+  }
+  
+  if (!user.isAdmin) {
+    showToast(`${username} is not an admin`);
+    return;
+  }
+  
+  user.isAdmin = false;
+  user.isSuperAdmin = false;
+  saveUsersToDatabase(allUsers);
+  document.getElementById('admin-profile-manage-username').value = '';
+  showToast(`✓ ${username}'s admin rights revoked`);
+  updateAdminProfileList();
+}
+
+// ── CHANGE ANONYMOUS ID FUNCTION ──────────────────────────────────────────
+function adminChangeAnonID() {
+  const username = document.getElementById('admin-change-anonid-username').value.trim();
+  const newAnonID = document.getElementById('admin-change-anonid-new').value.trim();
+  
+  if (!username) {
+    showToast('Enter username');
+    return;
+  }
+  
+  const user = getUserByUsername(username);
+  if (!user) {
+    showToast('User not found');
+    return;
+  }
+  
+  const oldAnonID = user.anonID;
+  
+  // If new ID provided, validate format
+  if (newAnonID) {
+    // Check if format is valid (ANON_*_****)
+    if (!newAnonID.startsWith('ANON_')) {
+      showToast('❌ ID must start with ANON_');
+      return;
+    }
+    user.anonID = newAnonID;
+  } else {
+    // Generate new random anonID
+    user.anonID = genAnonName();
+  }
+  
+  // Save changes
+  saveUsersToDatabase(allUsers);
+  
+  // Clear inputs
+  document.getElementById('admin-change-anonid-username').value = '';
+  document.getElementById('admin-change-anonid-new').value = '';
+  
+  showToast(`✓ ${username}'s ID changed: ${oldAnonID} → ${user.anonID}`);
+  updateAdminProfileList();
+  
+  showToast(`✓ Updated ${username}\n\nOld ID: ${oldAnonID}\nNew ID: ${user.anonID}\n\nNote: Posts created after this change will show new ID. Old posts remain unchanged.`);
+}
+
+function submitModeratorRequest() {
+  const boardId = document.getElementById('request-mod-board').value;
+  const reason = document.getElementById('request-mod-reason').value.trim();
+  
+  if (!SESSION_NAME) {
+    showToast('❌ Must be logged in to request moderator status');
+    return;
+  }
+  
+  if (!boardId) {
+    showToast('Select a board');
+    return;
+  }
+  
+  if (!reason) {
+    showToast('Tell us why you want to be a moderator');
+    return;
+  }
+  
+  if (requestModeratorStatus(SESSION_NAME, boardId, reason)) {
+    document.getElementById('request-mod-board').value = '';
+    document.getElementById('request-mod-reason').value = '';
+    closeModal('request-mod-modal');
+    showToast('✓ Moderator request submitted! Admins will review shortly.');
+  }
+}
+
+// Populate boards in moderator request modal
+function openRequestModModal() {
+  const boardSelect = document.getElementById('request-mod-board');
+  if (boardSelect) {
+    boardSelect.innerHTML = '<option value="">Select a board...</option>' + 
+      forums.map(f => `<option value="${f.id}">${f.icon || '📌'} ${f.name}</option>`).join('');
+  }
+  openModal('request-mod-modal');
+}
 
 // ── SQL.JS SQLITE SYSTEM ──────────────────────────────────────────────────
 let sqlDB = null;
@@ -5508,12 +6388,6 @@ function showToast(msg) {
     }
     updateLoginUI();
     loadSavedPostIds();
-    
-    // Login menu button click handler - prevent menu from closing immediately
-    document.getElementById('login-menu-btn')?.addEventListener('click', function(event) {
-      event.stopPropagation(); // Prevent the outside-click listener from immediately closing it
-      toggleUserMenu();
-    });
     
     // Show data status
     console.log('📊 Loaded data:', {
