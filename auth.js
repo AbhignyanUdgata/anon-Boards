@@ -13,6 +13,21 @@
 
 'use strict';
 
+// ── MODAL UTILITIES ──────────────────────────────────────────────────────
+function openModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.add('open');
+  }
+}
+
+function closeModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.remove('open');
+  }
+}
+
 // ── STATE ─────────────────────────────────────────────────────────────────
 let authenticatedUser = null;   // Currently logged-in user object
 let allUsers          = [];     // In-memory mirror of Supabase users table
